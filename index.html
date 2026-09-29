@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
   <meta charset="UTF-8">
 
   <meta
@@ -8,293 +10,638 @@
     content="width=device-width, initial-scale=1.0"
   >
 
-  <title>Audio & Video Call</title>
+  <title>Contact Me</title>
 
   <!-- PeerJS -->
   <script src="https://unpkg.com/peerjs@1.5.5/dist/peerjs.min.js"></script>
 
+
   <style>
+
     * {
       box-sizing: border-box;
     }
 
+
     body {
+
       margin: 0;
-      font-family: Arial, sans-serif;
+
+      font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
       background: #f4f6f8;
+
       color: #222;
+
     }
+
 
     .container {
+
       width: 100%;
-      max-width: 900px;
+
+      max-width: 850px;
+
       margin: auto;
+
       padding: 20px;
+
     }
+
 
     .card {
+
       background: white;
-      border-radius: 18px;
+
+      border-radius: 20px;
+
       padding: 25px;
-      box-shadow: 0 5px 25px rgba(0,0,0,0.08);
+
+      box-shadow:
+        0 8px 30px
+        rgba(0,0,0,0.08);
+
       text-align: center;
+
     }
+
 
     h1 {
+
       margin-top: 0;
-      font-size: 30px;
+
+      font-size: 32px;
+
     }
+
+
+    h2 {
+
+      margin-top: 10px;
+
+    }
+
 
     .subtitle {
+
       color: #666;
+
       margin-bottom: 25px;
+
     }
+
 
     .status {
-      background: #f1f3f5;
+
       padding: 12px;
+
       border-radius: 10px;
+
+      background: #f1f3f5;
+
       margin-bottom: 20px;
+
       font-size: 14px;
+
     }
+
 
     .buttons {
+
       display: flex;
-      gap: 15px;
+
+      gap: 12px;
+
       justify-content: center;
+
       flex-wrap: wrap;
-      margin-bottom: 20px;
+
+      margin-top: 20px;
+
     }
+
 
     button {
+
       border: none;
+
       border-radius: 12px;
-      padding: 15px 25px;
+
+      padding: 15px 24px;
+
       font-size: 16px;
-      cursor: pointer;
+
       font-weight: bold;
+
+      cursor: pointer;
+
+      transition: 0.2s;
+
     }
+
+
+    button:hover {
+
+      transform: translateY(-1px);
+
+    }
+
 
     button:disabled {
+
       opacity: 0.5;
+
       cursor: not-allowed;
+
+      transform: none;
+
     }
+
 
     .audio-btn {
-      background: #2196f3;
+
+      background: #1976d2;
+
       color: white;
+
     }
+
 
     .video-btn {
+
       background: #673ab7;
+
       color: white;
+
     }
+
 
     .accept-btn {
+
       background: #2e7d32;
+
       color: white;
+
     }
 
-    .reject-btn,
-    .end-btn {
+
+    .reject-btn {
+
       background: #d32f2f;
+
       color: white;
+
     }
+
+
+    .end-btn {
+
+      background: #d32f2f;
+
+      color: white;
+
+    }
+
 
     .secondary-btn {
+
       background: #555;
+
       color: white;
+
     }
+
 
     .hidden {
+
       display: none !important;
+
     }
+
 
     .incoming {
+
       background: #fff3cd;
+
       border: 1px solid #ffe69c;
+
       border-radius: 15px;
+
       padding: 20px;
+
       margin-bottom: 20px;
+
     }
 
-    .incoming h2 {
-      margin-top: 0;
+
+    .incoming-icon {
+
+      font-size: 45px;
+
     }
+
+
+    .incoming-title {
+
+      font-size: 22px;
+
+      font-weight: bold;
+
+      margin-top: 10px;
+
+    }
+
 
     .call-type {
-      font-weight: bold;
+
       font-size: 18px;
-      margin: 10px 0 20px;
+
+      margin-top: 8px;
+
+      color: #555;
+
     }
+
 
     .video-area {
+
       display: grid;
+
       grid-template-columns: 1fr 1fr;
+
       gap: 15px;
+
       margin-top: 20px;
+
     }
 
-    video {
-      width: 100%;
-      background: #111;
-      border-radius: 15px;
-      min-height: 220px;
-      object-fit: cover;
+
+    .video-box {
+
+      position: relative;
+
     }
+
 
     .video-label {
-      margin-bottom: 6px;
-      font-weight: bold;
+
       text-align: left;
+
+      font-weight: bold;
+
+      margin-bottom: 7px;
+
     }
 
-    .call-controls {
-      margin-top: 20px;
-    }
 
-    .peer-id-box {
-      margin-top: 20px;
-      background: #f8f9fa;
-      padding: 15px;
-      border-radius: 10px;
-      word-break: break-all;
-      font-size: 13px;
-      color: #555;
-    }
+    video {
 
-    input {
       width: 100%;
-      padding: 14px;
-      border: 1px solid #ccc;
-      border-radius: 10px;
-      margin: 10px 0;
-      font-size: 15px;
+
+      min-height: 220px;
+
+      background: #111;
+
+      border-radius: 15px;
+
+      object-fit: cover;
+
     }
 
-    .small {
-      font-size: 13px;
+
+    .audio-area {
+
+      margin-top: 20px;
+
+      padding: 35px 20px;
+
+      border-radius: 15px;
+
+      background: #f1f3f5;
+
+    }
+
+
+    .audio-icon {
+
+      font-size: 65px;
+
+    }
+
+
+    .call-status {
+
+      font-size: 18px;
+
+      font-weight: bold;
+
+      margin-top: 10px;
+
+    }
+
+
+    .host-panel {
+
+      margin-top: 25px;
+
+      padding: 20px;
+
+      background: #f8f9fa;
+
+      border-radius: 15px;
+
+      border: 1px solid #ddd;
+
+    }
+
+
+    .host-badge {
+
+      display: inline-block;
+
+      background: #222;
+
+      color: white;
+
+      padding: 6px 12px;
+
+      border-radius: 20px;
+
+      font-size: 12px;
+
+      margin-bottom: 10px;
+
+    }
+
+
+    .host-id {
+
+      font-size: 11px;
+
       color: #777;
+
+      word-break: break-all;
+
+      margin-top: 10px;
+
     }
 
-    @media (max-width: 700px) {
-      .video-area {
-        grid-template-columns: 1fr;
+
+    .notice {
+
+      margin-top: 20px;
+
+      font-size: 13px;
+
+      color: #777;
+
+      line-height: 1.5;
+
+    }
+
+
+    @media (max-width: 650px) {
+
+      .container {
+
+        padding: 10px;
+
       }
+
+
+      .card {
+
+        padding: 20px;
+
+      }
+
 
       h1 {
-        font-size: 25px;
+
+        font-size: 27px;
+
       }
 
-      button {
-        width: 100%;
+
+      .video-area {
+
+        grid-template-columns: 1fr;
+
       }
+
+
+      button {
+
+        width: 100%;
+
+      }
+
     }
+
   </style>
+
 </head>
+
 
 <body>
 
+
 <div class="container">
+
 
   <div class="card">
 
-    <h1>📞 Contact Me</h1>
 
-    <div class="subtitle">
-      Choose an audio or video call
+    <!-- ================================= -->
+    <!-- MAIN TITLE -->
+    <!-- ================================= -->
+
+    <h1 id="pageTitle">
+      📞 Contact Me
+    </h1>
+
+
+    <div
+      id="pageSubtitle"
+      class="subtitle"
+    >
+      Choose how you would like to contact me.
     </div>
 
-    <div id="status" class="status">
-      Connecting to call server...
+
+    <!-- ================================= -->
+    <!-- STATUS -->
+    <!-- ================================= -->
+
+    <div
+      id="status"
+      class="status"
+    >
+      Connecting...
     </div>
 
 
-    <!-- ========================= -->
-    <!-- CALLER SECTION -->
-    <!-- ========================= -->
+    <!-- ================================= -->
+    <!-- VISITOR MODE -->
+    <!-- ================================= -->
 
-    <div id="callerSection">
+    <div
+      id="visitorMode"
+    >
 
-      <h2>Start a Call</h2>
+      <h2>
+        Start a Call
+      </h2>
 
-      <input
-        type="text"
-        id="remotePeerId"
-        placeholder="Enter the other person's Peer ID"
-      >
 
       <div class="buttons">
 
-        <button
-          id="audioCallBtn"
-          class="audio-btn"
-        >
-          🎤 Audio Call
-        </button>
 
         <button
-          id="videoCallBtn"
+          id="visitorAudioBtn"
+          class="audio-btn"
+        >
+
+          🎤 Audio Call
+
+        </button>
+
+
+        <button
+          id="visitorVideoBtn"
           class="video-btn"
         >
+
           📹 Video Call
+
         </button>
+
+
+      </div>
+
+
+      <div class="notice">
+
+        No account or app installation is required.
+        <br>
+        Allow microphone/camera access when your browser asks.
 
       </div>
 
     </div>
 
 
-    <!-- ========================= -->
-    <!-- INCOMING CALL SECTION -->
-    <!-- ========================= -->
+    <!-- ================================= -->
+    <!-- HOST MODE -->
+    <!-- ================================= -->
+
+    <div
+      id="hostMode"
+      class="hidden"
+    >
+
+      <div class="host-panel">
+
+        <div class="host-badge">
+          HOST MODE
+        </div>
+
+
+        <h2>
+          🟢 You are online
+        </h2>
+
+
+        <p>
+          You can receive audio and video calls.
+        </p>
+
+
+      </div>
+
+    </div>
+
+
+    <!-- ================================= -->
+    <!-- INCOMING CALL -->
+    <!-- ================================= -->
 
     <div
       id="incomingSection"
       class="incoming hidden"
     >
 
-      <h2>📞 Incoming Call</h2>
-
-      <div id="incomingCallType" class="call-type">
-        Someone is calling you
+      <div
+        id="incomingIcon"
+        class="incoming-icon"
+      >
+        📞
       </div>
 
+
+      <div
+        id="incomingTitle"
+        class="incoming-title"
+      >
+        Incoming Call
+      </div>
+
+
+      <div
+        id="incomingType"
+        class="call-type"
+      >
+        Someone is calling you.
+      </div>
+
+
       <div class="buttons">
+
 
         <button
           id="acceptBtn"
           class="accept-btn"
         >
+
           ✅ Accept
+
         </button>
+
 
         <button
           id="rejectBtn"
           class="reject-btn"
         >
+
           ❌ Reject
+
         </button>
+
 
       </div>
 
     </div>
 
 
-    <!-- ========================= -->
-    <!-- VIDEO SECTION -->
-    <!-- ========================= -->
+    <!-- ================================= -->
+    <!-- VIDEO -->
+    <!-- ================================= -->
 
     <div
       id="videoSection"
       class="video-area hidden"
     >
 
-      <div>
+
+      <div class="video-box">
 
         <div class="video-label">
-          Your Camera
+          You
         </div>
+
 
         <video
           id="localVideo"
@@ -306,11 +653,12 @@
       </div>
 
 
-      <div>
+      <div class="video-box">
 
         <div class="video-label">
-          Other Person
+          Caller
         </div>
+
 
         <video
           id="remoteVideo"
@@ -320,91 +668,85 @@
 
       </div>
 
+
     </div>
 
 
-    <!-- ========================= -->
-    <!-- AUDIO CALL INDICATOR -->
-    <!-- ========================= -->
+    <!-- ================================= -->
+    <!-- AUDIO -->
+    <!-- ================================= -->
 
     <div
       id="audioSection"
-      class="hidden"
-      style="
-        margin-top:20px;
-        padding:30px;
-        background:#f1f3f5;
-        border-radius:15px;
-      "
+      class="audio-area hidden"
     >
 
-      <div style="font-size:50px;">
+      <div class="audio-icon">
         🎤
       </div>
 
-      <h2>Audio Call</h2>
 
-      <p id="audioStatus">
-        Connected
-      </p>
+      <h2>
+        Audio Call
+      </h2>
+
+
+      <div
+        id="audioCallStatus"
+        class="call-status"
+      >
+        Connecting...
+      </div>
 
     </div>
 
 
-    <!-- ========================= -->
+    <!-- ================================= -->
     <!-- CALL CONTROLS -->
-    <!-- ========================= -->
+    <!-- ================================= -->
 
     <div
       id="callControls"
-      class="call-controls hidden"
+      class="hidden"
     >
 
       <div class="buttons">
+
 
         <button
           id="muteBtn"
           class="secondary-btn"
         >
+
           🔇 Mute
+
         </button>
+
 
         <button
           id="cameraBtn"
-          class="secondary-btn"
+          class="secondary-btn hidden"
         >
+
           📷 Camera Off
+
         </button>
+
 
         <button
           id="endBtn"
           class="end-btn"
         >
+
           🔴 End Call
+
         </button>
 
+
       </div>
 
     </div>
 
-
-    <!-- ========================= -->
-    <!-- YOUR PEER ID -->
-    <!-- ========================= -->
-
-    <div class="peer-id-box">
-
-      <strong>Your Peer ID:</strong>
-
-      <div id="myPeerId">
-        Connecting...
-      </div>
-
-      <p class="small">
-        For this testing version, the caller needs this Peer ID.
-      </p>
-
-    </div>
 
   </div>
 
@@ -413,196 +755,272 @@
 
 <script>
 
-  // ==========================================
-  // VARIABLES
-  // ==========================================
 
-  let peer = null;
-
-  let localStream = null;
-
-  let currentCall = null;
-
-  let incomingCall = null;
-
-  let currentCallType = null;
-
-  let isMuted = false;
-
-  let isCameraOff = false;
+/* =========================================================
+   CONFIGURATION
+   ========================================================= */
 
 
-  // ==========================================
-  // HTML ELEMENTS
-  // ==========================================
+/*
+   IMPORTANT:
 
-  const status =
-    document.getElementById("status");
+   This is your permanent HOST PEER ID.
 
-  const myPeerId =
-    document.getElementById("myPeerId");
+   Do NOT change it after you start sharing your public link.
 
-  const remotePeerId =
-    document.getElementById("remotePeerId");
-
-  const audioCallBtn =
-    document.getElementById("audioCallBtn");
-
-  const videoCallBtn =
-    document.getElementById("videoCallBtn");
-
-  const incomingSection =
-    document.getElementById("incomingSection");
-
-  const incomingCallType =
-    document.getElementById("incomingCallType");
-
-  const acceptBtn =
-    document.getElementById("acceptBtn");
-
-  const rejectBtn =
-    document.getElementById("rejectBtn");
-
-  const videoSection =
-    document.getElementById("videoSection");
-
-  const audioSection =
-    document.getElementById("audioSection");
-
-  const localVideo =
-    document.getElementById("localVideo");
-
-  const remoteVideo =
-    document.getElementById("remoteVideo");
-
-  const callControls =
-    document.getElementById("callControls");
-
-  const muteBtn =
-    document.getElementById("muteBtn");
-
-  const cameraBtn =
-    document.getElementById("cameraBtn");
-
-  const endBtn =
-    document.getElementById("endBtn");
-
-  const audioStatus =
-    document.getElementById("audioStatus");
+   This is a randomly generated 32-character ID.
+*/
 
 
-  // ==========================================
-  // CREATE PEER
-  // ==========================================
-
-  peer = new Peer();
+const HOST_PEER_ID =
+  "7f4c9a2e81d64b53a0f7c1e9d6b28a41";
 
 
-  // ==========================================
-  // PEER CONNECTED
-  // ==========================================
+/*
+   Public visitors use:
 
-  peer.on("open", function(id) {
+   https://YOUR-USERNAME.github.io/video-call/
 
-    myPeerId.textContent = id;
+   You use:
 
-    status.textContent =
-      "🟢 Ready to receive calls.";
+   https://YOUR-USERNAME.github.io/video-call/?host=1
 
-  });
+*/
 
 
-  // ==========================================
-  // INCOMING CALL
-  // ==========================================
+/* =========================================================
+   VARIABLES
+   ========================================================= */
 
-  peer.on("call", function(call) {
+let peer = null;
 
-    incomingCall = call;
+let currentCall = null;
 
-    const metadata =
-      call.metadata || {};
+let incomingCall = null;
 
-    currentCallType =
-      metadata.callType || "video";
+let localStream = null;
 
+let currentCallType = null;
 
-    if (currentCallType === "audio") {
+let isHost = false;
 
-      incomingCallType.textContent =
-        "🎤 Incoming Audio Call";
+let isMuted = false;
 
-    } else {
-
-      incomingCallType.textContent =
-        "📹 Incoming Video Call";
-
-    }
+let isCameraOff = false;
 
 
-    incomingSection.classList.remove("hidden");
+/* =========================================================
+   ELEMENTS
+   ========================================================= */
 
-    status.textContent =
-      "📞 Someone is calling you.";
+const status =
+  document.getElementById("status");
 
-  });
+const visitorMode =
+  document.getElementById("visitorMode");
+
+const hostMode =
+  document.getElementById("hostMode");
+
+const pageTitle =
+  document.getElementById("pageTitle");
+
+const pageSubtitle =
+  document.getElementById("pageSubtitle");
+
+const visitorAudioBtn =
+  document.getElementById("visitorAudioBtn");
+
+const visitorVideoBtn =
+  document.getElementById("visitorVideoBtn");
+
+const incomingSection =
+  document.getElementById("incomingSection");
+
+const incomingIcon =
+  document.getElementById("incomingIcon");
+
+const incomingTitle =
+  document.getElementById("incomingTitle");
+
+const incomingType =
+  document.getElementById("incomingType");
+
+const acceptBtn =
+  document.getElementById("acceptBtn");
+
+const rejectBtn =
+  document.getElementById("rejectBtn");
+
+const videoSection =
+  document.getElementById("videoSection");
+
+const localVideo =
+  document.getElementById("localVideo");
+
+const remoteVideo =
+  document.getElementById("remoteVideo");
+
+const audioSection =
+  document.getElementById("audioSection");
+
+const audioCallStatus =
+  document.getElementById("audioCallStatus");
+
+const callControls =
+  document.getElementById("callControls");
+
+const muteBtn =
+  document.getElementById("muteBtn");
+
+const cameraBtn =
+  document.getElementById("cameraBtn");
+
+const endBtn =
+  document.getElementById("endBtn");
 
 
-  // ==========================================
-  // ACCEPT INCOMING CALL
-  // ==========================================
+/* =========================================================
+   DETECT HOST MODE
+   ========================================================= */
 
-  acceptBtn.addEventListener(
-    "click",
-    async function() {
+const urlParams =
+  new URLSearchParams(
+    window.location.search
+  );
 
-      if (!incomingCall) {
-        return;
-      }
 
-      try {
+isHost =
+  urlParams.get("host") === "1";
 
-        incomingSection.classList.add(
-          "hidden"
-        );
+
+/* =========================================================
+   START PEER
+   ========================================================= */
+
+if (isHost) {
+
+  startHost();
+
+} else {
+
+  startVisitor();
+
+}
+
+
+/* =========================================================
+   HOST
+   ========================================================= */
+
+function startHost() {
+
+
+  visitorMode.classList.add(
+    "hidden"
+  );
+
+
+  hostMode.classList.remove(
+    "hidden"
+  );
+
+
+  pageTitle.textContent =
+    "📞 Host Control";
+
+
+  pageSubtitle.textContent =
+    "You are ready to receive calls.";
+
+
+  status.textContent =
+    "Connecting as host...";
+
+
+  /*
+     Use the fixed host ID.
+  */
+
+
+  peer =
+    new Peer(
+      HOST_PEER_ID
+    );
+
+
+  setupPeerEvents();
+
+
+}
+
+
+/* =========================================================
+   VISITOR
+   ========================================================= */
+
+function startVisitor() {
+
+
+  hostMode.classList.add(
+    "hidden"
+  );
+
+
+  visitorMode.classList.remove(
+    "hidden"
+  );
+
+
+  pageTitle.textContent =
+    "📞 Contact Me";
+
+
+  pageSubtitle.textContent =
+    "Choose audio or video call.";
+
+
+  status.textContent =
+    "Ready to call.";
+
+
+  /*
+     Visitor receives a random temporary Peer ID.
+
+     The visitor does NOT need to see it.
+  */
+
+
+  peer =
+    new Peer();
+
+
+  setupPeerEvents();
+
+}
+
+
+/* =========================================================
+   PEER EVENTS
+   ========================================================= */
+
+function setupPeerEvents() {
+
+
+  peer.on(
+    "open",
+    function(id) {
+
+
+      if (isHost) {
 
         status.textContent =
-          "Connecting...";
+          "🟢 You are online and ready to receive calls.";
 
-
-        if (currentCallType === "audio") {
-
-          await startLocalAudio();
-
-        } else {
-
-          await startLocalVideo();
-
-        }
-
-
-        currentCall =
-          incomingCall;
-
-
-        currentCall.answer(
-          localStream
-        );
-
-
-        setupCallEvents(
-          currentCall
-        );
-
-
-        incomingCall = null;
-
-      } catch (error) {
-
-        console.error(error);
+      } else {
 
         status.textContent =
-          "Could not access microphone/camera.";
+          "🟢 Ready to make a call.";
 
       }
 
@@ -610,338 +1028,624 @@
   );
 
 
-  // ==========================================
-  // REJECT CALL
-  // ==========================================
+  /*
+     Incoming calls are mainly relevant
+     to the host.
+  */
 
-  rejectBtn.addEventListener(
-    "click",
-    function() {
 
-      if (incomingCall) {
+  peer.on(
+    "call",
+    function(call) {
 
-        incomingCall.close();
 
-        incomingCall = null;
+      /*
+         If visitor somehow receives
+         a call, reject it.
+      */
+
+
+      if (!isHost) {
+
+        call.close();
+
+        return;
 
       }
+
+
+      incomingCall =
+        call;
+
+
+      const metadata =
+        call.metadata || {};
+
+
+      currentCallType =
+        metadata.callType ||
+        "audio";
+
+
+      showIncomingCall();
+
+    }
+  );
+
+
+  peer.on(
+    "error",
+    function(error) {
+
+
+      console.error(
+        "PeerJS error:",
+        error
+      );
+
+
+      if (
+        error.type ===
+        "unavailable-id"
+      ) {
+
+        status.textContent =
+          "❌ Host ID is currently in use. Close another Host Mode tab.";
+
+        return;
+
+      }
+
+
+      if (
+        error.type ===
+        "peer-unavailable"
+      ) {
+
+        status.textContent =
+          "❌ The host is currently offline.";
+
+        return;
+
+      }
+
+
+      status.textContent =
+        "❌ Connection error: " +
+        error.type;
+
+    }
+  );
+
+
+  peer.on(
+    "disconnected",
+    function() {
+
+
+      status.textContent =
+        "⚠️ Connection to call server lost.";
+
+
+    }
+  );
+
+
+  peer.on(
+    "close",
+    function() {
+
+
+      status.textContent =
+        "Connection closed.";
+
+
+    }
+  );
+
+}
+
+
+/* =========================================================
+   SHOW INCOMING CALL
+   ========================================================= */
+
+function showIncomingCall() {
+
+
+  incomingSection.classList.remove(
+    "hidden"
+  );
+
+
+  if (
+    currentCallType ===
+    "video"
+  ) {
+
+
+    incomingIcon.textContent =
+      "📹";
+
+
+    incomingTitle.textContent =
+      "Incoming Video Call";
+
+
+    incomingType.textContent =
+      "Someone wants to start a video call with you.";
+
+
+  } else {
+
+
+    incomingIcon.textContent =
+      "🎤";
+
+
+    incomingTitle.textContent =
+      "Incoming Audio Call";
+
+
+    incomingType.textContent =
+      "Someone wants to start an audio call with you.";
+
+  }
+
+
+  status.textContent =
+    "🔔 Incoming call!";
+
+}
+
+
+/* =========================================================
+   VISITOR AUDIO CALL
+   ========================================================= */
+
+visitorAudioBtn.addEventListener(
+  "click",
+  async function() {
+
+
+    try {
+
+
+      visitorAudioBtn.disabled =
+        true;
+
+
+      visitorVideoBtn.disabled =
+        true;
+
+
+      status.textContent =
+        "Requesting microphone access...";
+
+
+      localStream =
+        await navigator.mediaDevices
+          .getUserMedia(
+            {
+              audio: true,
+              video: false
+            }
+          );
+
+
+      currentCallType =
+        "audio";
+
+
+      status.textContent =
+        "📞 Calling...";
+
+
+      currentCall =
+        peer.call(
+          HOST_PEER_ID,
+          localStream,
+          {
+            metadata: {
+              callType: "audio"
+            }
+          }
+        );
+
+
+      setupCallConnection(
+        currentCall
+      );
+
+
+    } catch (error) {
+
+
+      console.error(
+        error
+      );
+
+
+      status.textContent =
+        "❌ Microphone permission was not granted.";
+
+
+      resetVisitorButtons();
+
+    }
+
+  }
+);
+
+
+/* =========================================================
+   VISITOR VIDEO CALL
+   ========================================================= */
+
+visitorVideoBtn.addEventListener(
+  "click",
+  async function() {
+
+
+    try {
+
+
+      visitorAudioBtn.disabled =
+        true;
+
+
+      visitorVideoBtn.disabled =
+        true;
+
+
+      status.textContent =
+        "Requesting camera and microphone access...";
+
+
+      localStream =
+        await navigator.mediaDevices
+          .getUserMedia(
+            {
+              audio: true,
+              video: true
+            }
+          );
+
+
+      currentCallType =
+        "video";
+
+
+      localVideo.srcObject =
+        localStream;
+
+
+      videoSection.classList.remove(
+        "hidden"
+      );
+
+
+      cameraBtn.classList.remove(
+        "hidden"
+      );
+
+
+      status.textContent =
+        "📹 Calling...";
+
+
+      currentCall =
+        peer.call(
+          HOST_PEER_ID,
+          localStream,
+          {
+            metadata: {
+              callType: "video"
+            }
+          }
+        );
+
+
+      setupCallConnection(
+        currentCall
+      );
+
+
+    } catch (error) {
+
+
+      console.error(
+        error
+      );
+
+
+      status.textContent =
+        "❌ Camera/microphone permission was not granted.";
+
+
+      resetVisitorButtons();
+
+    }
+
+  }
+);
+
+
+/* =========================================================
+   ACCEPT INCOMING CALL
+   ========================================================= */
+
+acceptBtn.addEventListener(
+  "click",
+  async function() {
+
+
+    if (!incomingCall) {
+
+      return;
+
+    }
+
+
+    try {
+
 
       incomingSection.classList.add(
         "hidden"
       );
 
+
+      if (
+        currentCallType ===
+        "video"
+      ) {
+
+
+        status.textContent =
+          "Starting camera and microphone...";
+
+
+        localStream =
+          await navigator.mediaDevices
+            .getUserMedia(
+              {
+                audio: true,
+                video: true
+              }
+            );
+
+
+        localVideo.srcObject =
+          localStream;
+
+
+        videoSection.classList.remove(
+          "hidden"
+        );
+
+
+        cameraBtn.classList.remove(
+          "hidden"
+        );
+
+
+      } else {
+
+
+        status.textContent =
+          "Starting microphone...";
+
+
+        localStream =
+          await navigator.mediaDevices
+            .getUserMedia(
+              {
+                audio: true,
+                video: false
+              }
+            );
+
+
+        audioSection.classList.remove(
+          "hidden"
+        );
+
+      }
+
+
+      currentCall =
+        incomingCall;
+
+
+      currentCall.answer(
+        localStream
+      );
+
+
+      setupCallConnection(
+        currentCall
+      );
+
+
+      incomingCall =
+        null;
+
+
+    } catch (error) {
+
+
+      console.error(
+        error
+      );
+
+
       status.textContent =
-        "Call rejected.";
+        "❌ Could not access your microphone/camera.";
+
+
+      incomingCall = null;
 
     }
-  );
+
+  }
+);
 
 
-  // ==========================================
-  // AUDIO CALL BUTTON
-  // ==========================================
+/* =========================================================
+   REJECT
+   ========================================================= */
 
-  audioCallBtn.addEventListener(
-    "click",
-    async function() {
-
-      const remoteId =
-        remotePeerId.value.trim();
+rejectBtn.addEventListener(
+  "click",
+  function() {
 
 
-      if (!remoteId) {
+    if (incomingCall) {
 
-        alert(
-          "Enter the other person's Peer ID first."
+      incomingCall.close();
+
+      incomingCall = null;
+
+    }
+
+
+    incomingSection.classList.add(
+      "hidden"
+    );
+
+
+    status.textContent =
+      "Call rejected.";
+
+  }
+);
+
+
+/* =========================================================
+   CALL CONNECTION
+   ========================================================= */
+
+function setupCallConnection(
+  call
+) {
+
+
+  if (!call) {
+
+    return;
+
+  }
+
+
+  call.on(
+    "stream",
+    function(remoteStream) {
+
+
+      remoteVideo.srcObject =
+        remoteStream;
+
+
+      if (
+        currentCallType ===
+        "video"
+      ) {
+
+
+        videoSection.classList.remove(
+          "hidden"
         );
 
-        return;
 
-      }
-
-
-      try {
-
-        await startLocalAudio();
-
-
-        currentCallType =
-          "audio";
-
-
-        status.textContent =
-          "📞 Calling by audio...";
-
-
-        currentCall =
-          peer.call(
-            remoteId,
-            localStream,
-            {
-              metadata: {
-                callType: "audio"
-              }
-            }
+        remoteVideo.play()
+          .catch(
+            function() {}
           );
 
 
-        setupCallEvents(
-          currentCall
+      } else {
+
+
+        audioSection.classList.remove(
+          "hidden"
         );
 
-      } catch (error) {
 
-        console.error(error);
-
-        status.textContent =
-          "Could not access microphone.";
-
-      }
-
-    }
-  );
-
-
-  // ==========================================
-  // VIDEO CALL BUTTON
-  // ==========================================
-
-  videoCallBtn.addEventListener(
-    "click",
-    async function() {
-
-      const remoteId =
-        remotePeerId.value.trim();
-
-
-      if (!remoteId) {
-
-        alert(
-          "Enter the other person's Peer ID first."
+        createRemoteAudio(
+          remoteStream
         );
-
-        return;
 
       }
 
 
-      try {
-
-        await startLocalVideo();
-
-
-        currentCallType =
-          "video";
-
-
-        status.textContent =
-          "📹 Calling by video...";
-
-
-        currentCall =
-          peer.call(
-            remoteId,
-            localStream,
-            {
-              metadata: {
-                callType: "video"
-              }
-            }
-          );
-
-
-        setupCallEvents(
-          currentCall
-        );
-
-      } catch (error) {
-
-        console.error(error);
-
-        status.textContent =
-          "Could not access camera/microphone.";
-
-      }
-
-    }
-  );
-
-
-  // ==========================================
-  // START AUDIO
-  // ==========================================
-
-  async function startLocalAudio() {
-
-    stopLocalStream();
-
-
-    localStream =
-      await navigator.mediaDevices.getUserMedia(
-        {
-          audio: true,
-          video: false
-        }
+      callControls.classList.remove(
+        "hidden"
       );
 
 
-    audioSection.classList.remove(
-      "hidden"
-    );
-
-    videoSection.classList.add(
-      "hidden"
-    );
-
-    callControls.classList.remove(
-      "hidden"
-    );
+      audioCallStatus.textContent =
+        "🟢 Connected";
 
 
-    localVideo.srcObject = null;
+      status.textContent =
+        "🟢 Call connected.";
 
-  }
-
-
-  // ==========================================
-  // START VIDEO
-  // ==========================================
-
-  async function startLocalVideo() {
-
-    stopLocalStream();
+    }
+  );
 
 
-    localStream =
-      await navigator.mediaDevices.getUserMedia(
-        {
-          audio: true,
-          video: true
-        }
+  call.on(
+    "close",
+    function() {
+
+      endCallUI();
+
+    }
+  );
+
+
+  call.on(
+    "error",
+    function(error) {
+
+
+      console.error(
+        "Call error:",
+        error
       );
 
 
-    localVideo.srcObject =
-      localStream;
+      status.textContent =
+        "❌ Call connection error.";
 
 
-    videoSection.classList.remove(
-      "hidden"
-    );
+      endCallUI();
 
-    audioSection.classList.add(
-      "hidden"
-    );
+    }
+  );
 
-    callControls.classList.remove(
-      "hidden"
-    );
+}
 
 
-    await localVideo.play();
+/* =========================================================
+   REMOTE AUDIO
+   ========================================================= */
 
-  }
-
-
-  // ==========================================
-  // CALL EVENTS
-  // ==========================================
-
-  function setupCallEvents(call) {
-
-    call.on(
-      "stream",
-      function(remoteStream) {
-
-        remoteVideo.srcObject =
-          remoteStream;
+function createRemoteAudio(
+  stream
+) {
 
 
-        if (
-          currentCallType === "video"
-        ) {
-
-          videoSection.classList.remove(
-            "hidden"
-          );
-
-          remoteVideo.play();
-
-        } else {
-
-          audioSection.classList.remove(
-            "hidden"
-          );
-
-
-          const audioPlayer =
-            document.getElementById(
-              "remoteAudio"
-            );
-
-
-          if (audioPlayer) {
-
-            audioPlayer.srcObject =
-              remoteStream;
-
-          } else {
-
-            createRemoteAudio(
-              remoteStream
-            );
-
-          }
-
-        }
-
-
-        status.textContent =
-          "🟢 Call connected.";
-
-      }
+  let audio =
+    document.getElementById(
+      "remoteAudio"
     );
 
 
-    call.on(
-      "close",
-      function() {
-
-        endCallUI();
-
-      }
-    );
+  if (!audio) {
 
 
-    call.on(
-      "error",
-      function(error) {
-
-        console.error(
-          "Call error:",
-          error
-        );
-
-        status.textContent =
-          "Call connection error.";
-
-        endCallUI();
-
-      }
-    );
-
-  }
-
-
-  // ==========================================
-  // CREATE AUDIO PLAYER
-  // ==========================================
-
-  function createRemoteAudio(
-    stream
-  ) {
-
-    const audio =
+    audio =
       document.createElement(
         "audio"
       );
@@ -959,10 +1663,6 @@
       true;
 
 
-    audio.srcObject =
-      stream;
-
-
     document.body.appendChild(
       audio
     );
@@ -970,129 +1670,133 @@
   }
 
 
-  // ==========================================
-  // MUTE / UNMUTE
-  // ==========================================
-
-  muteBtn.addEventListener(
-    "click",
-    function() {
-
-      if (!localStream) {
-        return;
-      }
+  audio.srcObject =
+    stream;
 
 
-      const audioTracks =
-        localStream.getAudioTracks();
+  audio.play()
+    .catch(
+      function() {}
+    );
+
+}
 
 
-      if (audioTracks.length === 0) {
-        return;
-      }
+/* =========================================================
+   MUTE
+   ========================================================= */
+
+muteBtn.addEventListener(
+  "click",
+  function() {
 
 
-      isMuted =
-        !isMuted;
+    if (!localStream) {
 
-
-      audioTracks.forEach(
-        function(track) {
-
-          track.enabled =
-            !isMuted;
-
-        }
-      );
-
-
-      muteBtn.textContent =
-        isMuted
-          ? "🔊 Unmute"
-          : "🔇 Mute";
+      return;
 
     }
-  );
 
 
-  // ==========================================
-  // CAMERA ON/OFF
-  // ==========================================
-
-  cameraBtn.addEventListener(
-    "click",
-    function() {
-
-      if (!localStream) {
-        return;
-      }
+    const tracks =
+      localStream.getAudioTracks();
 
 
-      const videoTracks =
-        localStream.getVideoTracks();
+    if (
+      tracks.length === 0
+    ) {
 
-
-      if (videoTracks.length === 0) {
-
-        return;
-
-      }
-
-
-      isCameraOff =
-        !isCameraOff;
-
-
-      videoTracks.forEach(
-        function(track) {
-
-          track.enabled =
-            !isCameraOff;
-
-        }
-      );
-
-
-      cameraBtn.textContent =
-        isCameraOff
-          ? "📷 Camera On"
-          : "📷 Camera Off";
+      return;
 
     }
-  );
 
 
-  // ==========================================
-  // END CALL
-  // ==========================================
+    isMuted =
+      !isMuted;
 
-  endBtn.addEventListener(
-    "click",
-    function() {
 
-      if (currentCall) {
+    tracks.forEach(
+      function(track) {
 
-        currentCall.close();
+        track.enabled =
+          !isMuted;
 
       }
+    );
 
 
-      endCallUI();
+    muteBtn.textContent =
+      isMuted
+        ? "🔊 Unmute"
+        : "🔇 Mute";
+
+  }
+);
+
+
+/* =========================================================
+   CAMERA
+   ========================================================= */
+
+cameraBtn.addEventListener(
+  "click",
+  function() {
+
+
+    if (!localStream) {
+
+      return;
 
     }
-  );
 
 
-  // ==========================================
-  // END CALL UI
-  // ==========================================
+    const tracks =
+      localStream.getVideoTracks();
 
-  function endCallUI() {
 
-    stopLocalStream();
+    if (
+      tracks.length === 0
+    ) {
+
+      return;
+
+    }
+
+
+    isCameraOff =
+      !isCameraOff;
+
+
+    tracks.forEach(
+      function(track) {
+
+        track.enabled =
+          !isCameraOff;
+
+      }
+    );
+
+
+    cameraBtn.textContent =
+      isCameraOff
+        ? "📷 Camera On"
+        : "📷 Camera Off";
+
+  }
+);
+
+
+/* =========================================================
+   END CALL
+   ========================================================= */
+
+endBtn.addEventListener(
+  "click",
+  function() {
 
 
     if (currentCall) {
+
 
       try {
 
@@ -1103,142 +1807,198 @@
     }
 
 
-    currentCall =
-      null;
+    endCallUI();
+
+  }
+);
 
 
-    incomingCall =
-      null;
+/* =========================================================
+   END CALL UI
+   ========================================================= */
+
+function endCallUI() {
 
 
-    localVideo.srcObject =
-      null;
+  if (currentCall) {
 
 
-    remoteVideo.srcObject =
-      null;
+    try {
+
+      currentCall.close();
+
+    } catch (error) {}
+
+  }
 
 
-    videoSection.classList.add(
-      "hidden"
+  currentCall =
+    null;
+
+
+  incomingCall =
+    null;
+
+
+  stopLocalStream();
+
+
+  localVideo.srcObject =
+    null;
+
+
+  remoteVideo.srcObject =
+    null;
+
+
+  const audio =
+    document.getElementById(
+      "remoteAudio"
     );
 
 
-    audioSection.classList.add(
-      "hidden"
-    );
+  if (audio) {
+
+    audio.srcObject =
+      null;
+
+    audio.remove();
+
+  }
 
 
-    callControls.classList.add(
-      "hidden"
-    );
+  videoSection.classList.add(
+    "hidden"
+  );
 
 
-    incomingSection.classList.add(
-      "hidden"
-    );
+  audioSection.classList.add(
+    "hidden"
+  );
 
 
-    isMuted =
-      false;
+  callControls.classList.add(
+    "hidden"
+  );
 
 
-    isCameraOff =
-      false;
+  incomingSection.classList.add(
+    "hidden"
+  );
 
 
-    muteBtn.textContent =
-      "🔇 Mute";
+  isMuted =
+    false;
 
 
-    cameraBtn.textContent =
-      "📷 Camera Off";
+  isCameraOff =
+    false;
+
+
+  muteBtn.textContent =
+    "🔇 Mute";
+
+
+  cameraBtn.textContent =
+    "📷 Camera Off";
+
+
+  if (isHost) {
 
 
     status.textContent =
-      "🟢 Ready for another call.";
+      "🟢 You are online and ready to receive calls.";
+
+
+  } else {
+
+
+    status.textContent =
+      "🟢 Ready to make another call.";
+
+
+    resetVisitorButtons();
+
+  }
+
+}
+
+
+/* =========================================================
+   STOP LOCAL STREAM
+   ========================================================= */
+
+function stopLocalStream() {
+
+
+  if (!localStream) {
+
+    return;
 
   }
 
 
-  // ==========================================
-  // STOP LOCAL STREAM
-  // ==========================================
+  localStream
+    .getTracks()
+    .forEach(
+      function(track) {
 
-  function stopLocalStream() {
-
-    if (!localStream) {
-      return;
-    }
-
-
-    localStream
-      .getTracks()
-      .forEach(
-        function(track) {
-
-          track.stop();
-
-        }
-      );
-
-
-    localStream =
-      null;
-
-  }
-
-
-  // ==========================================
-  // PEER ERROR
-  // ==========================================
-
-  peer.on(
-    "error",
-    function(error) {
-
-      console.error(
-        "PeerJS error:",
-        error
-      );
-
-
-      if (
-        error.type ===
-        "peer-unavailable"
-      ) {
-
-        status.textContent =
-          "❌ The other Peer ID is not online.";
-
-      } else {
-
-        status.textContent =
-          "❌ Connection error: " +
-          error.type;
+        track.stop();
 
       }
+    );
+
+
+  localStream =
+    null;
+
+}
+
+
+/* =========================================================
+   RESET VISITOR BUTTONS
+   ========================================================= */
+
+function resetVisitorButtons() {
+
+
+  visitorAudioBtn.disabled =
+    false;
+
+
+  visitorVideoBtn.disabled =
+    false;
+
+}
+
+
+/* =========================================================
+   PAGE CLOSE
+   ========================================================= */
+
+window.addEventListener(
+  "beforeunload",
+  function() {
+
+
+    if (peer) {
+
+
+      try {
+
+        peer.destroy();
+
+      } catch (error) {}
 
     }
-  );
 
-
-  // ==========================================
-  // PEER DISCONNECTED
-  // ==========================================
-
-  peer.on(
-    "disconnected",
-    function() {
-
-      status.textContent =
-        "⚠️ Disconnected from call server.";
-
-    }
-  );
+  }
+);
 
 
 </script>
 
+
 </body>
+
 </html>
