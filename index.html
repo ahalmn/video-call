@@ -2,51 +2,24 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
-  >
-
-  <title>Private Call</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Peer Call</title>
 
   <script src="https://unpkg.com/peerjs@1.5.5/dist/peerjs.min.js"></script>
 
   <style>
     * {
       box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    :root {
-      --bg: #f4f7fb;
-      --card: #ffffff;
-      --text: #172033;
-      --muted: #6b7280;
-      --border: #e5e7eb;
-      --primary: #2563eb;
-      --primary-dark: #1d4ed8;
-      --success: #16a34a;
-      --danger: #dc2626;
-      --warning: #d97706;
-      --dark: #111827;
-      --shadow: 0 15px 45px rgba(15, 23, 42, 0.09);
     }
 
     html,
     body {
       margin: 0;
+      padding: 0;
       min-height: 100%;
-      background: var(--bg);
-      color: var(--text);
-      font-family:
-        Inter,
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        Roboto,
-        Arial,
-        sans-serif;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f4f6f8;
+      color: #1f2937;
     }
 
     body {
@@ -59,232 +32,151 @@
     }
 
     button {
-      border: 0;
       cursor: pointer;
+      border: none;
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
     }
 
     .app {
       min-height: 100vh;
-      padding: 18px;
       display: flex;
       justify-content: center;
-      align-items: center;
+      padding: 20px;
     }
 
     .container {
       width: 100%;
-      max-width: 540px;
+      max-width: 560px;
     }
 
-    /* STATUS */
-
-    .status {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 17px;
-      padding: 12px 15px;
+    .status-bar {
       display: flex;
       align-items: center;
-      gap: 11px;
-      margin-bottom: 13px;
-      box-shadow: 0 5px 20px rgba(15, 23, 42, 0.04);
+      gap: 8px;
+      padding: 12px 15px;
+      margin-bottom: 14px;
+      background: #ffffff;
+      border-radius: 12px;
+      border: 1px solid #e5e7eb;
+      font-size: 14px;
     }
 
     .status-dot {
-      width: 11px;
-      height: 11px;
+      width: 9px;
+      height: 9px;
       border-radius: 50%;
       background: #9ca3af;
       flex-shrink: 0;
     }
 
     .status-dot.online {
-      background: var(--success);
-      box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.12);
+      background: #22c55e;
     }
 
-    .status-dot.connecting {
-      background: var(--warning);
-      box-shadow: 0 0 0 4px rgba(217, 119, 6, 0.12);
+    .status-dot.warning {
+      background: #f59e0b;
     }
 
-    .status-dot.offline {
-      background: var(--danger);
-      box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.12);
+    .status-dot.error {
+      background: #ef4444;
     }
-
-    .status-content {
-      min-width: 0;
-    }
-
-    .status-title {
-      font-weight: 700;
-      font-size: 14px;
-    }
-
-    .status-description {
-      color: var(--muted);
-      font-size: 12px;
-      margin-top: 2px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    /* CARD */
 
     .card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 24px;
+      background: #ffffff;
+      border-radius: 18px;
       padding: 22px;
-      box-shadow: var(--shadow);
+      border: 1px solid #e5e7eb;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
     }
 
-    /* PEER ID */
+    .section {
+      margin-bottom: 24px;
+    }
+
+    .section:last-child {
+      margin-bottom: 0;
+    }
 
     .section-title {
-      font-size: 15px;
-      font-weight: 750;
+      font-size: 16px;
+      font-weight: 700;
       margin-bottom: 9px;
     }
 
-    .id-box {
+    .input-row {
       display: flex;
       gap: 8px;
-      margin-bottom: 7px;
     }
 
-    .peer-id {
-      flex: 1;
-      min-width: 0;
-      height: 50px;
-      border: 1px solid var(--border);
-      background: #f8fafc;
-      border-radius: 14px;
-      padding: 0 13px;
-      font-family:
-        ui-monospace,
-        SFMono-Regular,
-        Menlo,
-        Monaco,
-        Consolas,
-        monospace;
-      font-size: 14px;
-      font-weight: 700;
-      color: var(--text);
-      outline: none;
-    }
-
-    .peer-id:focus {
-      border-color: var(--primary);
-    }
-
-    .copy-button {
-      height: 50px;
-      min-width: 58px;
-      padding: 0 13px;
-      border-radius: 14px;
-      background: #e8efff;
-      color: var(--primary-dark);
-      font-weight: 750;
-    }
-
-    .copy-button:active {
-      transform: scale(0.97);
-    }
-
-    .id-help {
-      color: var(--muted);
-      font-size: 12px;
-      line-height: 1.45;
-      margin-bottom: 22px;
-    }
-
-    /* REMOTE ID */
-
-    .remote-input {
+    input {
       width: 100%;
-      height: 52px;
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 0 14px;
+      min-width: 0;
+      height: 46px;
+      padding: 0 13px;
+      border: 1px solid #d1d5db;
+      border-radius: 10px;
       outline: none;
-      color: var(--text);
       background: #fff;
-      font-size: 15px;
+      color: #111827;
     }
 
-    .remote-input:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.10);
+    input:focus {
+      border-color: #6b7280;
     }
 
-    .remote-input::placeholder {
-      color: #9ca3af;
+    input[readonly] {
+      background: #f9fafb;
     }
 
-    .remote-help {
-      color: var(--muted);
-      font-size: 12px;
-      margin: 7px 0 18px;
+    .copy-btn {
+      flex-shrink: 0;
+      padding: 0 16px;
+      border-radius: 10px;
+      background: #111827;
+      color: white;
+      font-weight: 600;
     }
 
-    /* CALL BUTTONS */
+    .help {
+      margin-top: 7px;
+      color: #6b7280;
+      font-size: 13px;
+      line-height: 1.4;
+    }
 
     .call-buttons {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 11px;
+      gap: 10px;
+      margin-top: 12px;
     }
 
-    .call-button {
-      min-height: 112px;
-      border-radius: 19px;
+    .call-btn {
+      min-height: 48px;
+      border-radius: 10px;
       color: white;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      transition: transform 0.12s ease, opacity 0.12s ease;
+      font-weight: 700;
     }
 
-    .call-button:active {
-      transform: scale(0.97);
+    .audio-btn {
+      background: #16a34a;
     }
 
-    .call-button:disabled {
-      opacity: 0.45;
-      cursor: not-allowed;
-    }
-
-    .audio {
+    .video-btn {
       background: #2563eb;
     }
 
-    .video {
-      background: #7c3aed;
-    }
-
-    .call-icon {
-      font-size: 31px;
-    }
-
-    .call-label {
-      font-size: 14px;
-      font-weight: 750;
-    }
-
-    /* MESSAGE */
-
     .message {
       display: none;
-      margin-top: 14px;
+      margin-top: 15px;
       padding: 12px 14px;
-      border-radius: 13px;
-      font-size: 13px;
-      line-height: 1.45;
+      border-radius: 10px;
+      font-size: 14px;
+      line-height: 1.4;
     }
 
     .message.show {
@@ -292,572 +184,694 @@
     }
 
     .message.info {
-      color: #1e40af;
-      background: #dbeafe;
-      border: 1px solid #bfdbfe;
-    }
-
-    .message.error {
-      color: #991b1b;
-      background: #fee2e2;
-      border: 1px solid #fecaca;
+      background: #eff6ff;
+      color: #1d4ed8;
     }
 
     .message.success {
-      color: #166534;
-      background: #dcfce7;
-      border: 1px solid #bbf7d0;
+      background: #f0fdf4;
+      color: #15803d;
     }
 
-    /* INCOMING CALL */
+    .message.error {
+      background: #fef2f2;
+      color: #b91c1c;
+    }
 
-    .incoming-overlay {
+    /* Overlay */
+
+    .overlay {
       position: fixed;
       inset: 0;
-      z-index: 100;
+      z-index: 1000;
       display: none;
       align-items: center;
       justify-content: center;
       padding: 20px;
-      background: rgba(15, 23, 42, 0.78);
-      backdrop-filter: blur(8px);
+      background: rgba(0, 0, 0, 0.65);
     }
 
-    .incoming-overlay.show {
+    .overlay.show {
       display: flex;
     }
 
-    .incoming-card {
+    .dialog {
       width: 100%;
       max-width: 390px;
       background: white;
-      border-radius: 27px;
-      padding: 29px 22px 22px;
+      border-radius: 22px;
+      padding: 28px 22px;
       text-align: center;
-      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.25);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
     }
 
-    .incoming-icon {
-      width: 80px;
-      height: 80px;
-      margin: 0 auto 14px;
-      border-radius: 50%;
-      background: #e8efff;
+    .call-icon {
+      width: 70px;
+      height: 70px;
+      margin: 0 auto 15px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 34px;
+      border-radius: 50%;
+      background: #eff6ff;
+      font-size: 32px;
     }
 
-    .incoming-card h2 {
-      margin: 0;
-      font-size: 22px;
+    .dialog h2 {
+      margin: 0 0 8px;
+      font-size: 23px;
     }
 
-    .incoming-peer {
-      margin-top: 7px;
-      color: var(--muted);
-      font-family: monospace;
-      font-size: 13px;
-      word-break: break-all;
+    .dialog p {
+      margin: 6px 0;
+      color: #6b7280;
+      font-size: 14px;
+      word-break: break-word;
     }
 
-    .incoming-type {
-      margin: 5px 0 21px;
-      color: var(--muted);
-      font-size: 13px;
+    .dialog strong {
+      color: #111827;
     }
 
     .incoming-buttons {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 10px;
+      margin-top: 22px;
     }
 
-    .incoming-button {
-      height: 54px;
-      border-radius: 15px;
-      font-weight: 750;
+    .reject-btn,
+    .accept-btn {
+      min-height: 48px;
+      border-radius: 11px;
+      color: white;
+      font-weight: 700;
     }
 
-    .reject {
-      background: #fee2e2;
-      color: #b91c1c;
+    .reject-btn {
+      background: #dc2626;
     }
 
-    .accept {
-      background: #dcfce7;
-      color: #15803d;
+    .accept-btn {
+      background: #16a34a;
     }
 
-    /* CALL SCREEN */
+    /* Outgoing */
+
+    .calling-dialog {
+      padding-top: 30px;
+      padding-bottom: 24px;
+    }
+
+    .calling-icon {
+      position: relative;
+      width: 78px;
+      height: 78px;
+      margin-bottom: 18px;
+      border-radius: 50%;
+      background: #eff6ff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 34px;
+    }
+
+    .calling-icon::before,
+    .calling-icon::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border: 2px solid #93c5fd;
+      border-radius: 50%;
+      animation: pulse 1.8s infinite;
+    }
+
+    .calling-icon::after {
+      animation-delay: 0.9s;
+    }
+
+    @keyframes pulse {
+      0% {
+        transform: scale(1);
+        opacity: 0.8;
+      }
+
+      100% {
+        transform: scale(1.55);
+        opacity: 0;
+      }
+    }
+
+    .calling-text {
+      font-size: 16px;
+      font-weight: 600;
+      margin-top: 15px;
+    }
+
+    .calling-dots::after {
+      content: "";
+      animation: dots 1.4s infinite;
+    }
+
+    @keyframes dots {
+      0% {
+        content: "";
+      }
+
+      25% {
+        content: ".";
+      }
+
+      50% {
+        content: "..";
+      }
+
+      75%,
+      100% {
+        content: "...";
+      }
+    }
+
+    .cancel-call-btn {
+      width: 100%;
+      min-height: 48px;
+      margin-top: 24px;
+      border-radius: 11px;
+      background: #dc2626;
+      color: white;
+      font-weight: 700;
+    }
+
+    /* Active call */
 
     .call-screen {
       position: fixed;
       inset: 0;
-      z-index: 90;
+      z-index: 1100;
       display: none;
-      flex-direction: column;
-      background: #080b12;
+      background: #000;
       color: white;
     }
 
     .call-screen.show {
       display: flex;
+      flex-direction: column;
     }
 
     .call-header {
-      height: 66px;
-      flex-shrink: 0;
-      padding: 11px 17px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: rgba(8, 11, 18, 0.9);
+      position: absolute;
       z-index: 5;
+      top: 0;
+      left: 0;
+      right: 0;
+      padding: calc(15px + env(safe-area-inset-top)) 16px 15px;
+      background: linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0.75),
+        rgba(0, 0, 0, 0)
+      );
     }
 
-    .caller-name {
-      font-weight: 750;
+    .call-header-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: flex-start;
+    }
+
+    .remote-name {
+      font-weight: 700;
       font-size: 15px;
+      word-break: break-all;
+    }
+
+    .call-meta {
+      margin-top: 4px;
+      font-size: 13px;
+      opacity: 0.75;
     }
 
     .timer {
-      color: #aeb7c7;
-      font-size: 12px;
-      margin-top: 2px;
-    }
-
-    .call-type {
-      color: #aeb7c7;
-      font-size: 12px;
+      font-size: 14px;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
     }
 
     .video-area {
-      flex: 1;
-      min-height: 0;
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      position: absolute;
+      inset: 0;
       overflow: hidden;
-      background: #080b12;
+      background: #111;
     }
 
     #remoteVideo {
       width: 100%;
       height: 100%;
-      object-fit: contain;
-      background: #080b12;
+      object-fit: cover;
+      background: #111;
     }
 
     #localVideo {
       position: absolute;
-      top: 14px;
-      right: 14px;
-      width: 112px;
-      height: 150px;
+      top: calc(72px + env(safe-area-inset-top));
+      right: 15px;
+      width: 110px;
+      height: 155px;
       object-fit: cover;
-      border-radius: 15px;
-      border: 2px solid rgba(255,255,255,0.25);
-      background: #171c27;
-      z-index: 4;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+      border-radius: 12px;
+      background: #222;
+      border: 2px solid rgba(255, 255, 255, 0.7);
+      z-index: 3;
     }
 
     .audio-avatar {
+      position: absolute;
+      inset: 0;
       display: none;
-      width: 120px;
-      height: 120px;
-      border-radius: 50%;
-      background: #2563eb;
       align-items: center;
       justify-content: center;
-      font-size: 50px;
+      background: #111;
+      z-index: 1;
     }
 
-    .audio-mode .audio-avatar {
+    .audio-avatar-circle {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
       display: flex;
-    }
-
-    .audio-mode #remoteVideo,
-    .audio-mode #localVideo {
-      display: none;
+      align-items: center;
+      justify-content: center;
+      background: #374151;
+      font-size: 42px;
     }
 
     .call-controls {
-      flex-shrink: 0;
-      padding:
-        17px
-        15px
-        calc(17px + env(safe-area-inset-bottom));
-      background: rgba(8, 11, 18, 0.96);
-    }
-
-    .controls-row {
+      position: absolute;
+      z-index: 10;
+      left: 0;
+      right: 0;
+      bottom: 0;
       display: flex;
       justify-content: center;
-      align-items: center;
-      gap: 11px;
+      gap: 12px;
+      padding: 18px 15px calc(20px + env(safe-area-inset-bottom));
+      background: linear-gradient(
+        to top,
+        rgba(0, 0, 0, 0.8),
+        rgba(0, 0, 0, 0)
+      );
     }
 
-    .control {
-      width: 56px;
-      height: 56px;
+    .control-btn {
+      width: 58px;
+      height: 58px;
       border-radius: 50%;
-      background: #252b37;
       color: white;
+      background: #374151;
+      font-size: 22px;
       display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 2px;
-      font-size: 20px;
     }
 
-    .control small {
-      font-size: 8px;
-      opacity: 0.8;
-    }
-
-    .control.active {
-      background: white;
-      color: #111827;
-    }
-
-    .end-call {
-      width: 66px;
-      height: 56px;
-      border-radius: 28px;
+    .control-btn.active {
       background: #dc2626;
-      font-size: 24px;
     }
 
-    @media (max-width: 430px) {
+    .end-btn {
+      background: #dc2626;
+    }
 
+    .control-label {
+      position: absolute;
+      bottom: calc(82px + env(safe-area-inset-bottom));
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 6px 11px;
+      border-radius: 20px;
+      background: rgba(0, 0, 0, 0.65);
+      font-size: 12px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+    }
+
+    /* Waiting screen */
+
+    .waiting-banner {
+      position: absolute;
+      z-index: 20;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      display: none;
+      text-align: center;
+      width: 90%;
+      max-width: 350px;
+    }
+
+    .waiting-banner.show {
+      display: block;
+    }
+
+    .waiting-circle {
+      width: 82px;
+      height: 82px;
+      margin: 0 auto 18px;
+      border-radius: 50%;
+      background: #1f2937;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 35px;
+    }
+
+    .waiting-title {
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    .waiting-subtitle {
+      margin-top: 8px;
+      color: #d1d5db;
+      font-size: 14px;
+      word-break: break-word;
+    }
+
+    @media (max-width: 500px) {
       .app {
         padding: 12px;
       }
 
       .card {
         padding: 18px;
-        border-radius: 21px;
+        border-radius: 15px;
       }
 
-      .call-button {
-        min-height: 105px;
+      .call-buttons {
+        grid-template-columns: 1fr;
+      }
+
+      .input-row {
+        flex-direction: column;
+      }
+
+      .copy-btn {
+        height: 44px;
       }
 
       #localVideo {
-        width: 95px;
-        height: 128px;
+        width: 92px;
+        height: 130px;
+        top: calc(70px + env(safe-area-inset-top));
+        right: 10px;
       }
-
-      .control {
-        width: 52px;
-        height: 52px;
-      }
-
-      .end-call {
-        width: 62px;
-        height: 52px;
-      }
-
     }
   </style>
 </head>
 
 <body>
 
-<div class="app">
+  <div class="app">
+    <main class="container">
 
-  <main class="container">
+      <div class="status-bar">
+        <span id="statusDot" class="status-dot"></span>
+        <span id="statusText">Connecting...</span>
+      </div>
 
-    <!-- STATUS -->
+      <div class="card">
 
-    <div class="status">
+        <div class="section">
+          <div class="section-title">Your Peer ID</div>
 
-      <div
-        id="statusDot"
-        class="status-dot connecting"
-      ></div>
+          <div class="input-row">
+            <input
+              id="myPeerId"
+              type="text"
+              readonly
+            >
 
-      <div class="status-content">
+            <button
+              id="copyBtn"
+              class="copy-btn"
+              disabled
+            >
+              Copy
+            </button>
+          </div>
 
-        <div
-          id="statusTitle"
-          class="status-title"
-        >
-          Connecting…
+          <div class="help">
+            Share this Peer ID with the person who wants to call you.
+          </div>
         </div>
 
-        <div
-          id="statusDescription"
-          class="status-description"
-        >
-          Connecting to PeerJS
+        <div class="section">
+
+          <div class="section-title">
+            Enter Peer ID to Call
+          </div>
+
+          <input
+            id="remotePeerId"
+            type="text"
+            autocomplete="off"
+          >
+
+          <div class="help">
+            Enter the other person's Peer ID.
+          </div>
+
+          <div class="call-buttons">
+
+            <button
+              id="audioCallBtn"
+              class="call-btn audio-btn"
+              disabled
+            >
+              🎤 Audio Call
+            </button>
+
+            <button
+              id="videoCallBtn"
+              class="call-btn video-btn"
+              disabled
+            >
+              📹 Video Call
+            </button>
+
+          </div>
+
+          <div
+            id="message"
+            class="message"
+          ></div>
+
         </div>
 
       </div>
 
-    </div>
-
-
-    <!-- MAIN CARD -->
-
-    <section class="card">
-
-      <!-- YOUR PEER ID -->
-
-      <div class="section-title">
-        Your Peer ID
-      </div>
-
-      <div class="id-box">
-
-        <input
-          id="myPeerId"
-          class="peer-id"
-          type="text"
-          readonly
-          placeholder="Generating…"
-        >
-
-        <button
-          id="copyButton"
-          class="copy-button"
-          onclick="copyPeerId()"
-          disabled
-        >
-          Copy
-        </button>
-
-      </div>
-
-      <div class="id-help">
-        Share this Peer ID with the person who wants to call you.
-      </div>
-
-
-      <!-- REMOTE PEER ID -->
-
-      <div class="section-title">
-        Enter Peer ID to Call
-      </div>
-
-      <input
-        id="remotePeerId"
-        class="remote-input"
-        type="text"
-        autocomplete="off"
-        autocapitalize="none"
-        spellcheck="false"
-      >
-
-      <div class="remote-help">
-        Enter the other person's Peer ID.
-      </div>
-
-
-      <!-- CALL BUTTONS -->
-
-      <div class="call-buttons">
-
-        <button
-          id="audioButton"
-          class="call-button audio"
-          onclick="startCall('audio')"
-          disabled
-        >
-
-          <span class="call-icon">
-            🎤
-          </span>
-
-          <span class="call-label">
-            Audio Call
-          </span>
-
-        </button>
-
-
-        <button
-          id="videoButton"
-          class="call-button video"
-          onclick="startCall('video')"
-          disabled
-        >
-
-          <span class="call-icon">
-            📹
-          </span>
-
-          <span class="call-label">
-            Video Call
-          </span>
-
-        </button>
-
-      </div>
-
-
-      <!-- MESSAGE -->
-
-      <div
-        id="message"
-        class="message"
-      ></div>
-
-    </section>
-
-  </main>
-
-</div>
-
-
-<!-- INCOMING CALL -->
-
-<div
-  id="incomingOverlay"
-  class="incoming-overlay"
->
-
-  <div class="incoming-card">
-
-    <div class="incoming-icon">
-      📞
-    </div>
-
-    <h2>
-      Incoming Call
-    </h2>
-
-    <div
-      id="incomingPeer"
-      class="incoming-peer"
-    >
-      —
-    </div>
-
-    <div
-      id="incomingType"
-      class="incoming-type"
-    >
-      —
-    </div>
-
-    <div class="incoming-buttons">
-
-      <button
-        class="incoming-button reject"
-        onclick="rejectCall()"
-      >
-        ❌ Reject
-      </button>
-
-      <button
-        class="incoming-button accept"
-        onclick="acceptCall()"
-      >
-        ✅ Accept
-      </button>
-
-    </div>
-
+    </main>
   </div>
 
-</div>
 
-
-<!-- ACTIVE CALL -->
-
-<div
-  id="callScreen"
-  class="call-screen"
->
-
-  <div class="call-header">
-
-    <div>
-
-      <div
-        id="callerName"
-        class="caller-name"
-      >
-        Connected
-      </div>
-
-      <div
-        id="timer"
-        class="timer"
-      >
-        00:00
-      </div>
-
-    </div>
-
-    <div
-      id="callType"
-      class="call-type"
-    >
-      Video Call
-    </div>
-
-  </div>
-
+  <!-- Incoming Call -->
 
   <div
-    id="videoArea"
-    class="video-area"
+    id="incomingOverlay"
+    class="overlay"
   >
 
-    <video
-      id="remoteVideo"
-      autoplay
-      playsinline
-    ></video>
+    <div class="dialog">
 
-    <video
-      id="localVideo"
-      autoplay
-      muted
-      playsinline
-    ></video>
+      <div class="call-icon">
+        📞
+      </div>
 
-    <div class="audio-avatar">
-      🎧
+      <h2>Incoming Call</h2>
+
+      <p>
+        From:
+        <strong id="incomingPeerId"></strong>
+      </p>
+
+      <p id="incomingCallType">
+        Audio Call
+      </p>
+
+      <div class="incoming-buttons">
+
+        <button
+          id="rejectBtn"
+          class="reject-btn"
+        >
+          Reject
+        </button>
+
+        <button
+          id="acceptBtn"
+          class="accept-btn"
+        >
+          Accept
+        </button>
+
+      </div>
+
     </div>
 
   </div>
 
 
-  <div class="call-controls">
+  <!-- Outgoing Calling -->
 
-    <div class="controls-row">
+  <div
+    id="outgoingOverlay"
+    class="overlay"
+  >
+
+    <div class="dialog calling-dialog">
+
+      <div class="calling-icon">
+        📞
+      </div>
+
+      <h2>Calling<span class="calling-dots"></span></h2>
+
+      <p>
+        Calling:
+        <strong id="outgoingPeerId"></strong>
+      </p>
+
+      <p id="outgoingCallType">
+        Audio Call
+      </p>
+
+      <div class="calling-text">
+        Waiting for the other person to answer
+      </div>
 
       <button
-        id="muteButton"
-        class="control"
-        onclick="toggleMute()"
+        id="cancelCallBtn"
+        class="cancel-call-btn"
+      >
+        Cancel Call
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <!-- Active Call -->
+
+  <div
+    id="callScreen"
+    class="call-screen"
+  >
+
+    <div class="call-header">
+
+      <div class="call-header-top">
+
+        <div>
+          <div
+            id="callPeerId"
+            class="remote-name"
+          ></div>
+
+          <div
+            id="callTypeText"
+            class="call-meta"
+          ></div>
+        </div>
+
+        <div
+          id="callTimer"
+          class="timer"
+        >
+          00:00
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <div class="video-area">
+
+      <video
+        id="remoteVideo"
+        autoplay
+        playsinline
+      ></video>
+
+      <video
+        id="localVideo"
+        autoplay
+        muted
+        playsinline
+      ></video>
+
+      <div
+        id="audioAvatar"
+        class="audio-avatar"
+      >
+        <div class="audio-avatar-circle">
+          🎤
+        </div>
+      </div>
+
+      <div
+        id="waitingBanner"
+        class="waiting-banner"
+      >
+
+        <div class="waiting-circle">
+          📞
+        </div>
+
+        <div class="waiting-title">
+          Calling...
+        </div>
+
+        <div
+          id="waitingPeerText"
+          class="waiting-subtitle"
+        ></div>
+
+      </div>
+
+    </div>
+
+
+    <div
+      id="controlLabel"
+      class="control-label"
+    ></div>
+
+
+    <div class="call-controls">
+
+      <button
+        id="muteBtn"
+        class="control-btn"
+        title="Mute"
       >
         🎤
-        <small>Mute</small>
       </button>
 
-
       <button
-        id="cameraButton"
-        class="control"
-        onclick="toggleCamera()"
+        id="cameraBtn"
+        class="control-btn"
+        title="Camera"
       >
-        📷
-        <small>Camera</small>
+        📹
       </button>
 
-
       <button
-        class="control end-call"
-        onclick="endCall()"
+        id="endCallBtn"
+        class="control-btn end-btn"
+        title="End Call"
       >
         ☎
       </button>
@@ -866,1791 +880,1413 @@
 
   </div>
 
-</div>
-
 
 <script>
+  /* =========================================================
+     DOM
+  ========================================================= */
 
-/* ============================================================
-   APPLICATION
-============================================================ */
+  const myPeerIdInput = document.getElementById("myPeerId");
+  const remotePeerIdInput = document.getElementById("remotePeerId");
 
-let peer = null;
+  const copyBtn = document.getElementById("copyBtn");
+  const audioCallBtn = document.getElementById("audioCallBtn");
+  const videoCallBtn = document.getElementById("videoCallBtn");
 
-let currentCall = null;
+  const statusDot = document.getElementById("statusDot");
+  const statusText = document.getElementById("statusText");
+  const messageBox = document.getElementById("message");
 
-let incomingCall = null;
+  const incomingOverlay = document.getElementById("incomingOverlay");
+  const incomingPeerId = document.getElementById("incomingPeerId");
+  const incomingCallType = document.getElementById("incomingCallType");
+  const acceptBtn = document.getElementById("acceptBtn");
+  const rejectBtn = document.getElementById("rejectBtn");
 
-let localStream = null;
+  const outgoingOverlay = document.getElementById("outgoingOverlay");
+  const outgoingPeerId = document.getElementById("outgoingPeerId");
+  const outgoingCallType = document.getElementById("outgoingCallType");
+  const cancelCallBtn = document.getElementById("cancelCallBtn");
 
-let remoteStream = null;
+  const callScreen = document.getElementById("callScreen");
+  const callPeerId = document.getElementById("callPeerId");
+  const callTypeText = document.getElementById("callTypeText");
+  const callTimer = document.getElementById("callTimer");
 
-let currentCallType = null;
+  const remoteVideo = document.getElementById("remoteVideo");
+  const localVideo = document.getElementById("localVideo");
+  const audioAvatar = document.getElementById("audioAvatar");
+  const waitingBanner = document.getElementById("waitingBanner");
+  const waitingPeerText = document.getElementById("waitingPeerText");
 
-let isMuted = false;
-
-let isCameraOff = false;
-
-let timerStart = null;
-
-let timerInterval = null;
-
-let peerReady = false;
-
-/*
-  Separate PeerJS DataConnection used only for
-  call status messages such as "declined".
-*/
-let callStatusConnection = null;
-
-
-/* ============================================================
-   DOM
-============================================================ */
-
-const myPeerId =
-  document.getElementById("myPeerId");
-
-const remotePeerId =
-  document.getElementById("remotePeerId");
-
-const copyButton =
-  document.getElementById("copyButton");
-
-const audioButton =
-  document.getElementById("audioButton");
-
-const videoButton =
-  document.getElementById("videoButton");
-
-const statusDot =
-  document.getElementById("statusDot");
-
-const statusTitle =
-  document.getElementById("statusTitle");
-
-const statusDescription =
-  document.getElementById("statusDescription");
-
-const message =
-  document.getElementById("message");
-
-const incomingOverlay =
-  document.getElementById("incomingOverlay");
-
-const incomingPeer =
-  document.getElementById("incomingPeer");
-
-const incomingType =
-  document.getElementById("incomingType");
-
-const callScreen =
-  document.getElementById("callScreen");
-
-const videoArea =
-  document.getElementById("videoArea");
-
-const remoteVideo =
-  document.getElementById("remoteVideo");
-
-const localVideo =
-  document.getElementById("localVideo");
-
-const callerName =
-  document.getElementById("callerName");
-
-const callType =
-  document.getElementById("callType");
-
-const timer =
-  document.getElementById("timer");
-
-const muteButton =
-  document.getElementById("muteButton");
-
-const cameraButton =
-  document.getElementById("cameraButton");
+  const muteBtn = document.getElementById("muteBtn");
+  const cameraBtn = document.getElementById("cameraBtn");
+  const endCallBtn = document.getElementById("endCallBtn");
 
 
-/* ============================================================
-   INITIALIZE
-============================================================ */
+  /* =========================================================
+     STATE
+  ========================================================= */
 
-window.addEventListener(
-  "DOMContentLoaded",
-  initialize
-);
+  let peer = null;
+
+  let localStream = null;
+  let currentCall = null;
+  let incomingCall = null;
+
+  let currentCallType = null;
+  let currentRemotePeerId = null;
+
+  let callStatusConnection = null;
+
+  let callTimerInterval = null;
+  let callStartTime = null;
+
+  let isMuted = false;
+  let isCameraOff = false;
+
+  let outgoingCallPending = false;
 
 
-function initialize() {
+  /* =========================================================
+     PEER INITIALIZATION
+  ========================================================= */
 
-  setStatus(
-    "connecting",
-    "Connecting…",
-    "Creating your Peer ID"
-  );
+  function initializePeer() {
 
-  createPeer();
-
-}
-
-
-/* ============================================================
-   CREATE PEER
-============================================================ */
-
-function createPeer() {
-
-  peer =
-    new Peer({
+    peer = new Peer({
       debug: 1
     });
 
+    peer.on("open", handlePeerOpen);
 
-  peer.on(
-    "open",
-    handlePeerOpen
-  );
+    peer.on("call", handleIncomingCall);
 
+    peer.on("connection", handleIncomingDataConnection);
 
-  peer.on(
-    "call",
-    handleIncomingCall
-  );
+    peer.on("disconnected", handleDisconnected);
 
+    peer.on("error", handlePeerError);
 
-  /*
-    Receive DataConnections.
-
-    These are used for call-status messages.
-  */
-
-  peer.on(
-    "connection",
-    handleIncomingDataConnection
-  );
-
-
-  peer.on(
-    "error",
-    handlePeerError
-  );
-
-
-  peer.on(
-    "disconnected",
-    handleDisconnected
-  );
-
-
-  peer.on(
-    "close",
-    handlePeerClose
-  );
-
-}
-
-
-/* ============================================================
-   PEER OPEN
-============================================================ */
-
-function handlePeerOpen(id) {
-
-  console.log(
-    "My Peer ID:",
-    id
-  );
-
-
-  peerReady =
-    true;
-
-
-  myPeerId.value =
-    id;
-
-
-  copyButton.disabled =
-    false;
-
-
-  audioButton.disabled =
-    false;
-
-
-  videoButton.disabled =
-    false;
-
-
-  setStatus(
-    "online",
-    "Online",
-    "Your Peer ID is ready"
-  );
-
-
-  showMessage(
-    "Your Peer ID is ready. Share it with the person who wants to call you.",
-    "success"
-  );
-
-}
-
-
-/* ============================================================
-   COPY PEER ID
-============================================================ */
-
-async function copyPeerId() {
-
-  const id =
-    myPeerId.value.trim();
-
-  if (!id) {
-    return;
+    peer.on("close", () => {
+      setStatus("Disconnected", "error");
+      disableCallButtons();
+    });
   }
 
 
-  try {
+  function handlePeerOpen(id) {
 
-    await navigator.clipboard.writeText(
-      id
-    );
+    myPeerIdInput.value = id;
 
-    showMessage(
-      "Peer ID copied to clipboard.",
-      "success"
-    );
+    copyBtn.disabled = false;
+    enableCallButtons();
 
-  } catch (error) {
+    setStatus("Online", "online");
 
-    myPeerId.select();
-
-    document.execCommand(
-      "copy"
-    );
-
-    showMessage(
-      "Peer ID copied.",
-      "success"
-    );
-
-  }
-
-}
-
-
-/* ============================================================
-   START CALL
-============================================================ */
-
-async function startCall(type) {
-
-  if (!peerReady) {
-
-    showMessage(
-      "Please wait until your Peer ID is ready.",
-      "error"
-    );
-
-    return;
+    showMessage("You are ready to make and receive calls.", "success");
   }
 
 
-  const destination =
-    remotePeerId.value.trim();
+  /* =========================================================
+     STATUS
+  ========================================================= */
 
+  function setStatus(text, type = "") {
 
-  if (!destination) {
+    statusText.textContent = text;
 
-    showMessage(
-      "Enter the other person's Peer ID first.",
-      "error"
-    );
+    statusDot.className = "status-dot";
 
-    remotePeerId.focus();
-
-    return;
+    if (type) {
+      statusDot.classList.add(type);
+    }
   }
 
 
-  if (
-    destination === myPeerId.value.trim()
-  ) {
+  function showMessage(text, type = "info") {
 
-    showMessage(
-      "You cannot call your own Peer ID.",
-      "error"
-    );
-
-    return;
+    messageBox.textContent = text;
+    messageBox.className = "message show " + type;
   }
 
 
-  currentCallType =
-    type;
+  function hideMessage() {
 
-
-  try {
-
-    localStream =
-      await navigator.mediaDevices.getUserMedia({
-
-        audio: true,
-
-        video:
-          type === "video"
-
-      });
-
-  } catch (error) {
-
-    console.error(
-      "Media error:",
-      error
-    );
-
-    handleMediaError(
-      error
-    );
-
-    return;
-
+    messageBox.textContent = "";
+    messageBox.className = "message";
   }
 
 
-  /*
-    Create a separate reliable data connection
-    for call-status messages.
+  /* =========================================================
+     BUTTON STATE
+  ========================================================= */
 
-    The media call remains independent.
-  */
+  function enableCallButtons() {
 
-  createOutgoingStatusConnection(
-    destination
-  );
-
-
-  showMessage(
-    "Calling " + destination + "…",
-    "info"
-  );
-
-
-  currentCall =
-    peer.call(
-      destination,
-      localStream,
-      {
-        metadata: {
-          callType: type
-        }
-      }
-    );
-
-
-  if (!currentCall) {
-
-    stopLocalStream();
-
-    closeCallStatusConnection();
-
-    showMessage(
-      "The call could not be started.",
-      "error"
-    );
-
-    return;
-
+    audioCallBtn.disabled = false;
+    videoCallBtn.disabled = false;
   }
 
 
-  configureOutgoingCall(
-    currentCall
-  );
+  function disableCallButtons() {
 
-}
+    audioCallBtn.disabled = true;
+    videoCallBtn.disabled = true;
+  }
 
 
-/* ============================================================
-   OUTGOING STATUS CONNECTION
-============================================================ */
+  /* =========================================================
+     COPY PEER ID
+  ========================================================= */
 
-function createOutgoingStatusConnection(
-  destination
-) {
+  copyBtn.addEventListener("click", async () => {
 
-  try {
+    const id = myPeerIdInput.value;
 
-    callStatusConnection =
-      peer.connect(
+    if (!id) return;
+
+    try {
+
+      await navigator.clipboard.writeText(id);
+
+      const originalText = copyBtn.textContent;
+
+      copyBtn.textContent = "✓ Copied";
+
+      setTimeout(() => {
+        copyBtn.textContent = originalText;
+      }, 1500);
+
+    } catch (error) {
+
+      myPeerIdInput.select();
+      document.execCommand("copy");
+
+      copyBtn.textContent = "✓ Copied";
+
+      setTimeout(() => {
+        copyBtn.textContent = "Copy";
+      }, 1500);
+    }
+
+  });
+
+
+  /* =========================================================
+     OUTGOING CALL
+  ========================================================= */
+
+  audioCallBtn.addEventListener("click", () => {
+    startOutgoingCall("audio");
+  });
+
+
+  videoCallBtn.addEventListener("click", () => {
+    startOutgoingCall("video");
+  });
+
+
+  async function startOutgoingCall(type) {
+
+    if (!peer || !peer.open) {
+      showMessage("Peer connection is not ready.", "error");
+      return;
+    }
+
+    if (outgoingCallPending || currentCall) {
+      return;
+    }
+
+    const destination = remotePeerIdInput.value.trim();
+
+    if (!destination) {
+      showMessage("Enter the other person's Peer ID.", "error");
+      remotePeerIdInput.focus();
+      return;
+    }
+
+    if (destination === peer.id) {
+      showMessage("You cannot call your own Peer ID.", "error");
+      return;
+    }
+
+    hideMessage();
+
+    try {
+
+      localStream = await getMediaStream(type);
+
+      currentCallType = type;
+      currentRemotePeerId = destination;
+
+      outgoingCallPending = true;
+
+      createOutgoingStatusConnection(destination);
+
+      currentCall = peer.call(
         destination,
+        localStream,
         {
-          label: "call-status",
-          reliable: true,
-          serialization: "json"
+          metadata: {
+            callType: type
+          }
         }
       );
 
+      if (!currentCall) {
+        throw new Error("Unable to create call.");
+      }
 
-    callStatusConnection.on(
-      "open",
-      () => {
+      setupOutgoingCall(currentCall);
+
+      showOutgoingCallingScreen(
+        destination,
+        type
+      );
+
+    } catch (error) {
+
+      console.error("Outgoing call error:", error);
+
+      cleanupMedia();
+
+      outgoingCallPending = false;
+
+      currentCall = null;
+
+      showMessage(
+        getMediaErrorMessage(error),
+        "error"
+      );
+    }
+  }
+
+
+  function setupOutgoingCall(call) {
+
+    call.on("stream", stream => {
+
+      if (!outgoingCallPending) {
+        return;
+      }
+
+      outgoingCallPending = false;
+
+      showActiveCallScreen(
+        call.peer,
+        currentCallType
+      );
+
+      attachRemoteStream(stream);
+
+      startCallTimer();
+
+    });
+
+
+    call.on("close", () => {
+
+      if (outgoingCallPending) {
+
+        outgoingCallPending = false;
+
+        cleanupMedia();
+
+        currentCall = null;
+
+        hideOutgoingCallingScreen();
+
+        showMessage("Call ended.", "info");
+
+        return;
+      }
+
+      finishCall("Call ended.");
+
+    });
+
+
+    call.on("error", error => {
+
+      console.error("Outgoing media call error:", error);
+
+      if (outgoingCallPending) {
+
+        outgoingCallPending = false;
+
+        cleanupMedia();
+
+        currentCall = null;
+
+        hideOutgoingCallingScreen();
+
+        handleCallError(error);
+
+      } else {
+
+        finishCall("Connection failed.");
+
+      }
+    });
+  }
+
+
+  /* =========================================================
+     OUTGOING CALL SCREEN
+  ========================================================= */
+
+  function showOutgoingCallingScreen(destination, type) {
+
+    outgoingPeerId.textContent = destination;
+
+    outgoingCallType.textContent =
+      type === "video"
+        ? "📹 Video Call"
+        : "🎤 Audio Call";
+
+    outgoingOverlay.classList.add("show");
+  }
+
+
+  function hideOutgoingCallingScreen() {
+
+    outgoingOverlay.classList.remove("show");
+  }
+
+
+  cancelCallBtn.addEventListener("click", () => {
+
+    outgoingCallPending = false;
+
+    if (currentCall) {
+      try {
+        currentCall.close();
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    currentCall = null;
+
+    closeCallStatusConnection();
+
+    cleanupMedia();
+
+    hideOutgoingCallingScreen();
+
+    showMessage("Call cancelled.", "info");
+  });
+
+
+  /* =========================================================
+     INCOMING CALL
+  ========================================================= */
+
+  function handleIncomingCall(call) {
+
+    console.log("Incoming call from:", call.peer);
+
+    if (currentCall || outgoingCallPending) {
+
+      sendStatusMessage(
+        call.peer,
+        {
+          type: "declined",
+          reason: "busy"
+        }
+      );
+
+      try {
+        call.close();
+      } catch (error) {
+        console.error(error);
+      }
+
+      return;
+    }
+
+    incomingCall = call;
+
+    currentCallType =
+      call.metadata?.callType || "audio";
+
+    incomingPeerId.textContent =
+      call.peer;
+
+    incomingCallType.textContent =
+      currentCallType === "video"
+        ? "📹 Video Call"
+        : "🎤 Audio Call";
+
+    incomingOverlay.classList.add("show");
+  }
+
+
+  /* =========================================================
+     ACCEPT INCOMING CALL
+  ========================================================= */
+
+  acceptBtn.addEventListener("click", async () => {
+
+    if (!incomingCall) {
+      return;
+    }
+
+    const call = incomingCall;
+
+    try {
+
+      incomingOverlay.classList.remove("show");
+
+      localStream = await getMediaStream(
+        currentCallType
+      );
+
+      currentCall = call;
+
+      call.answer(localStream);
+
+      setupIncomingAcceptedCall(call);
+
+      showActiveCallScreen(
+        call.peer,
+        currentCallType
+      );
+
+      waitingBanner.classList.remove("show");
+
+    } catch (error) {
+
+      console.error("Accept call error:", error);
+
+      try {
+        call.close();
+      } catch (closeError) {
+        console.error(closeError);
+      }
+
+      incomingCall = null;
+      currentCall = null;
+
+      cleanupMedia();
+
+      showMessage(
+        getMediaErrorMessage(error),
+        "error"
+      );
+    }
+  });
+
+
+  function setupIncomingAcceptedCall(call) {
+
+    call.on("stream", stream => {
+
+      attachRemoteStream(stream);
+
+      startCallTimer();
+    });
+
+
+    call.on("close", () => {
+
+      finishCall("Call ended.");
+    });
+
+
+    call.on("error", error => {
+
+      console.error("Incoming call error:", error);
+
+      finishCall("Connection failed.");
+    });
+  }
+
+
+  /* =========================================================
+     REJECT INCOMING CALL
+  ========================================================= */
+
+  rejectBtn.addEventListener("click", rejectCall);
+
+
+  function rejectCall() {
+
+    if (!incomingCall) {
+      return;
+    }
+
+    const callerId = incomingCall.peer;
+
+    sendStatusMessage(
+      callerId,
+      {
+        type: "declined",
+        reason: "rejected"
+      }
+    );
+
+    try {
+      incomingCall.close();
+    } catch (error) {
+      console.error(error);
+    }
+
+    incomingCall = null;
+
+    incomingOverlay.classList.remove("show");
+
+    showMessage("Call declined.", "info");
+  }
+
+
+  /* =========================================================
+     MEDIA
+  ========================================================= */
+
+  async function getMediaStream(type) {
+
+    if (!navigator.mediaDevices ||
+        !navigator.mediaDevices.getUserMedia) {
+
+      throw new Error(
+        "Media devices are not supported by this browser."
+      );
+    }
+
+    return await navigator.mediaDevices.getUserMedia({
+      audio: true,
+      video: type === "video"
+    });
+  }
+
+
+  function attachRemoteStream(stream) {
+
+    remoteVideo.srcObject = stream;
+
+    if (currentCallType === "video") {
+
+      remoteVideo.style.display = "block";
+      audioAvatar.style.display = "none";
+
+    } else {
+
+      remoteVideo.style.display = "none";
+      audioAvatar.style.display = "flex";
+    }
+
+    remoteVideo.play().catch(() => {});
+  }
+
+
+  function attachLocalStream() {
+
+    if (!localStream) {
+      return;
+    }
+
+    localVideo.srcObject = localStream;
+
+    if (currentCallType === "video") {
+      localVideo.style.display = "block";
+    } else {
+      localVideo.style.display = "none";
+    }
+  }
+
+
+  /* =========================================================
+     ACTIVE CALL SCREEN
+  ========================================================= */
+
+  function showActiveCallScreen(peerId, type) {
+
+    callPeerId.textContent = peerId;
+
+    callTypeText.textContent =
+      type === "video"
+        ? "📹 Video Call"
+        : "🎤 Audio Call";
+
+    callTimer.textContent = "00:00";
+
+    attachLocalStream();
+
+    callScreen.classList.add("show");
+
+    waitingBanner.classList.remove("show");
+  }
+
+
+  /* =========================================================
+     TIMER
+  ========================================================= */
+
+  function startCallTimer() {
+
+    stopCallTimer();
+
+    callStartTime = Date.now();
+
+    callTimer.textContent = "00:00";
+
+    callTimerInterval = setInterval(() => {
+
+      if (!callStartTime) {
+        return;
+      }
+
+      const elapsed =
+        Math.floor(
+          (Date.now() - callStartTime) / 1000
+        );
+
+      const minutes =
+        Math.floor(elapsed / 60)
+          .toString()
+          .padStart(2, "0");
+
+      const seconds =
+        (elapsed % 60)
+          .toString()
+          .padStart(2, "0");
+
+      callTimer.textContent =
+        `${minutes}:${seconds}`;
+
+    }, 1000);
+  }
+
+
+  function stopCallTimer() {
+
+    if (callTimerInterval) {
+      clearInterval(callTimerInterval);
+      callTimerInterval = null;
+    }
+
+    callStartTime = null;
+  }
+
+
+  /* =========================================================
+     MUTE
+  ========================================================= */
+
+  muteBtn.addEventListener("click", () => {
+
+    if (!localStream) {
+      return;
+    }
+
+    const audioTracks =
+      localStream.getAudioTracks();
+
+    if (!audioTracks.length) {
+      return;
+    }
+
+    isMuted = !isMuted;
+
+    audioTracks.forEach(track => {
+      track.enabled = !isMuted;
+    });
+
+    if (isMuted) {
+
+      muteBtn.textContent = "🔇";
+      muteBtn.classList.add("active");
+      muteBtn.title = "Unmute";
+
+    } else {
+
+      muteBtn.textContent = "🎤";
+      muteBtn.classList.remove("active");
+      muteBtn.title = "Mute";
+    }
+  });
+
+
+  /* =========================================================
+     CAMERA
+  ========================================================= */
+
+  cameraBtn.addEventListener("click", () => {
+
+    if (!localStream) {
+      return;
+    }
+
+    const videoTracks =
+      localStream.getVideoTracks();
+
+    if (!videoTracks.length) {
+      return;
+    }
+
+    isCameraOff = !isCameraOff;
+
+    videoTracks.forEach(track => {
+      track.enabled = !isCameraOff;
+    });
+
+    if (isCameraOff) {
+
+      cameraBtn.textContent = "🚫";
+      cameraBtn.classList.add("active");
+      cameraBtn.title = "Turn Camera On";
+
+    } else {
+
+      cameraBtn.textContent = "📹";
+      cameraBtn.classList.remove("active");
+      cameraBtn.title = "Turn Camera Off";
+    }
+  });
+
+
+  /* =========================================================
+     END CALL
+  ========================================================= */
+
+  endCallBtn.addEventListener("click", () => {
+
+    if (currentCall) {
+
+      try {
+        currentCall.close();
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    finishCall("Call ended.");
+  });
+
+
+  function finishCall(text) {
+
+    stopCallTimer();
+
+    outgoingCallPending = false;
+
+    if (currentCall) {
+
+      try {
+        currentCall.close();
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    if (incomingCall) {
+
+      try {
+        incomingCall.close();
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    currentCall = null;
+    incomingCall = null;
+
+    cleanupMedia();
+
+    closeCallStatusConnection();
+
+    remoteVideo.srcObject = null;
+    localVideo.srcObject = null;
+
+    callScreen.classList.remove("show");
+    outgoingOverlay.classList.remove("show");
+    incomingOverlay.classList.remove("show");
+
+    resetCallControls();
+
+    showMessage(text, "info");
+  }
+
+
+  /* =========================================================
+     CLEANUP MEDIA
+  ========================================================= */
+
+  function cleanupMedia() {
+
+    if (localStream) {
+
+      localStream.getTracks().forEach(track => {
+        track.stop();
+      });
+
+      localStream = null;
+    }
+  }
+
+
+  function resetCallControls() {
+
+    isMuted = false;
+    isCameraOff = false;
+
+    muteBtn.textContent = "🎤";
+    muteBtn.classList.remove("active");
+    muteBtn.title = "Mute";
+
+    cameraBtn.textContent = "📹";
+    cameraBtn.classList.remove("active");
+    cameraBtn.title = "Camera";
+
+    remoteVideo.style.display = "block";
+    audioAvatar.style.display = "none";
+
+    waitingBanner.classList.remove("show");
+  }
+
+
+  /* =========================================================
+     CALL STATUS DATA CONNECTION
+  ========================================================= */
+
+  function handleIncomingDataConnection(connection) {
+
+    console.log(
+      "Incoming data connection from:",
+      connection.peer
+    );
+
+    connection.on("open", () => {
+
+      if (connection.label === "call-status") {
+
+        callStatusConnection = connection;
+      }
+    });
+
+
+    connection.on("data", data => {
+
+      handleCallStatusData(data);
+    });
+
+
+    connection.on("error", error => {
+
+      console.error(
+        "Status connection error:",
+        error
+      );
+    });
+
+
+    connection.on("close", () => {
+
+      if (
+        callStatusConnection &&
+        callStatusConnection.peer === connection.peer
+      ) {
+
+        callStatusConnection = null;
+      }
+    });
+  }
+
+
+  function createOutgoingStatusConnection(destination) {
+
+    try {
+
+      if (
+        callStatusConnection &&
+        callStatusConnection.open &&
+        callStatusConnection.peer === destination
+      ) {
+        return;
+      }
+
+      const connection =
+        peer.connect(destination, {
+          label: "call-status",
+          reliable: true,
+          serialization: "json"
+        });
+
+      callStatusConnection = connection;
+
+      connection.on("open", () => {
 
         console.log(
           "Call status connection opened."
         );
-
-      }
-    );
+      });
 
 
-    callStatusConnection.on(
-      "data",
-      handleCallStatusData
-    );
+      connection.on("data", data => {
+
+        handleCallStatusData(data);
+      });
 
 
-    callStatusConnection.on(
-      "error",
-      error => {
+      connection.on("error", error => {
 
         console.error(
           "Call status connection error:",
           error
         );
-
-      }
-    );
-
-
-    callStatusConnection.on(
-      "close",
-      () => {
-
-        console.log(
-          "Call status connection closed."
-        );
-
-      }
-    );
-
-  } catch (error) {
-
-    console.error(
-      "Could not create status connection:",
-      error
-    );
-
-  }
-
-}
-
-
-/* ============================================================
-   INCOMING DATA CONNECTION
-============================================================ */
-
-function handleIncomingDataConnection(
-  connection
-) {
-
-  console.log(
-    "Incoming data connection from:",
-    connection.peer
-  );
-
-
-  connection.on(
-    "data",
-    data => {
-
-      handleCallStatusData(
-        data
-      );
-
-    }
-  );
-
-
-  connection.on(
-    "open",
-    () => {
-
-      /*
-        If this is a status connection for an
-        incoming call, keep it available.
-      */
-
-      if (
-        connection.label ===
-        "call-status"
-      ) {
-
-        callStatusConnection =
-          connection;
-
-      }
-
-    }
-  );
-
-
-  connection.on(
-    "error",
-    error => {
-
-      console.error(
-        "Incoming data connection error:",
-        error
-      );
-
-    }
-  );
-
-}
-
-
-/* ============================================================
-   CALL STATUS DATA
-============================================================ */
-
-function handleCallStatusData(
-  data
-) {
-
-  if (!data || !data.type) {
-    return;
-  }
-
-
-  if (
-    data.type ===
-    "declined"
-  ) {
-
-    finishCall(
-      "Call declined."
-    );
-
-  }
-
-}
-
-
-/* ============================================================
-   OUTGOING CALL
-============================================================ */
-
-function configureOutgoingCall(
-  call
-) {
-
-  call.on(
-    "stream",
-    stream => {
-
-      remoteStream =
-        stream;
-
-      attachRemoteStream(
-        stream
-      );
-
-      showCallScreen();
-
-    }
-  );
-
-
-  call.on(
-    "close",
-    () => {
-
-      /*
-        Do not overwrite the "Call declined"
-        message if the status message already
-        handled the call.
-      */
-
-      if (
-        currentCall === call
-      ) {
-
-        finishCall(
-          "The other person ended the call."
-        );
-
-      }
-
-    }
-  );
-
-
-  call.on(
-    "error",
-    error => {
-
-      console.error(
-        "Call error:",
-        error
-      );
-
-      finishCall(
-        "The call connection failed."
-      );
-
-    }
-  );
-
-
-  showCallScreen();
-
-}
-
-
-/* ============================================================
-   INCOMING CALL
-============================================================ */
-
-function handleIncomingCall(
-  call
-) {
-
-  console.log(
-    "Incoming call from:",
-    call.peer
-  );
-
-
-  /*
-    If already in a call, automatically reject.
-  */
-
-  if (currentCall) {
-
-    call.close();
-
-    /*
-      Tell caller that the person is busy.
-      This is separate from manual rejection.
-    */
-
-    sendStatusMessage(
-      call.peer,
-      {
-        type: "declined",
-        reason: "busy"
-      }
-    );
-
-    return;
-
-  }
-
-
-  incomingCall =
-    call;
-
-
-  currentCallType =
-    call.metadata?.callType ||
-    "audio";
-
-
-  incomingPeer.textContent =
-    call.peer;
-
-
-  incomingType.textContent =
-    currentCallType === "video"
-      ? "📹 Video Call"
-      : "🎤 Audio Call";
-
-
-  incomingOverlay.classList.add(
-    "show"
-  );
-
-}
-
-
-/* ============================================================
-   ACCEPT
-============================================================ */
-
-async function acceptCall() {
-
-  if (!incomingCall) {
-    return;
-  }
-
-
-  const call =
-    incomingCall;
-
-
-  incomingCall =
-    null;
-
-
-  incomingOverlay.classList.remove(
-    "show"
-  );
-
-
-  try {
-
-    localStream =
-      await navigator.mediaDevices.getUserMedia({
-
-        audio: true,
-
-        video:
-          currentCallType === "video"
-
       });
 
-  } catch (error) {
 
-    call.close();
+      connection.on("close", () => {
 
-    handleMediaError(
-      error
-    );
+        if (
+          callStatusConnection === connection
+        ) {
 
-    return;
-
-  }
-
-
-  currentCall =
-    call;
-
-
-  call.answer(
-    localStream
-  );
-
-
-  call.on(
-    "stream",
-    stream => {
-
-      remoteStream =
-        stream;
-
-      attachRemoteStream(
-        stream
-      );
-
-    }
-  );
-
-
-  call.on(
-    "close",
-    () => {
-
-      if (
-        currentCall === call
-      ) {
-
-        finishCall(
-          "The other person ended the call."
-        );
-
-      }
-
-    }
-  );
-
-
-  call.on(
-    "error",
-    error => {
-
-      console.error(
-        "Incoming call error:",
-        error
-      );
-
-      finishCall(
-        "The call connection failed."
-      );
-
-    }
-  );
-
-
-  showCallScreen();
-
-}
-
-
-/* ============================================================
-   REJECT CALL
-============================================================ */
-
-function rejectCall() {
-
-  if (!incomingCall) {
-    return;
-  }
-
-
-  const callerId =
-    incomingCall.peer;
-
-
-  /*
-    Send the decline message through a
-    separate PeerJS DataConnection.
-  */
-
-  sendStatusMessage(
-    callerId,
-    {
-      type: "declined",
-      reason: "rejected"
-    }
-  );
-
-
-  try {
-
-    incomingCall.close();
-
-  } catch (error) {
-
-    console.error(
-      "Could not close incoming call:",
-      error
-    );
-
-  }
-
-
-  incomingCall =
-    null;
-
-
-  incomingOverlay.classList.remove(
-    "show"
-  );
-
-
-  showMessage(
-    "Call declined.",
-    "info"
-  );
-
-}
-
-
-/* ============================================================
-   SEND STATUS MESSAGE
-============================================================ */
-
-function sendStatusMessage(
-  destination,
-  data
-) {
-
-  /*
-    If an existing status connection belongs
-    to this destination and is open, use it.
-  */
-
-  if (
-    callStatusConnection &&
-    callStatusConnection.open &&
-    callStatusConnection.peer === destination
-  ) {
-
-    try {
-
-      callStatusConnection.send(
-        data
-      );
-
-      return;
+          callStatusConnection = null;
+        }
+      });
 
     } catch (error) {
 
       console.error(
-        "Existing status connection failed:",
+        "Could not create status connection:",
         error
       );
-
     }
-
   }
 
 
-  /*
-    Otherwise create a temporary data connection
-    back to the caller.
+  function sendStatusMessage(destination, data) {
 
-    This is especially useful when the receiver
-    rejects very quickly.
-  */
+    if (
+      callStatusConnection &&
+      callStatusConnection.open &&
+      callStatusConnection.peer === destination
+    ) {
 
-  try {
+      try {
+        callStatusConnection.send(data);
+        return;
+      } catch (error) {
+        console.error(error);
+      }
+    }
 
-    const connection =
-      peer.connect(
-        destination,
-        {
+
+    try {
+
+      const connection =
+        peer.connect(destination, {
           label: "call-status",
           reliable: true,
           serialization: "json"
-        }
-      );
+        });
 
-
-    connection.on(
-      "open",
-      () => {
+      connection.on("open", () => {
 
         try {
 
-          connection.send(
-            data
-          );
+          connection.send(data);
+
+          setTimeout(() => {
+
+            try {
+              connection.close();
+            } catch (error) {
+              console.error(error);
+            }
+
+          }, 700);
 
         } catch (error) {
 
           console.error(
-            "Could not send status:",
+            "Could not send status message:",
             error
           );
-
         }
+      });
 
 
-        /*
-          Give the message time to travel
-          before closing the connection.
-        */
-
-        setTimeout(
-          () => {
-
-            try {
-
-              connection.close();
-
-            } catch (error) {}
-
-          },
-          500
-        );
-
-      }
-    );
-
-
-    connection.on(
-      "error",
-      error => {
+      connection.on("error", error => {
 
         console.error(
-          "Status connection error:",
+          "Temporary status connection error:",
           error
         );
-
-      }
-    );
-
-  } catch (error) {
-
-    console.error(
-      "Could not create status connection:",
-      error
-    );
-
-  }
-
-}
-
-
-/* ============================================================
-   CLOSE STATUS CONNECTION
-============================================================ */
-
-function closeCallStatusConnection() {
-
-  if (
-    callStatusConnection
-  ) {
-
-    try {
-
-      callStatusConnection.close();
-
-    } catch (error) {}
-
-  }
-
-
-  callStatusConnection =
-    null;
-
-}
-
-
-/* ============================================================
-   SHOW CALL SCREEN
-============================================================ */
-
-function showCallScreen() {
-
-  callScreen.classList.add(
-    "show"
-  );
-
-
-  if (
-    currentCallType === "audio"
-  ) {
-
-    videoArea.classList.add(
-      "audio-mode"
-    );
-
-    callType.textContent =
-      "Audio Call";
-
-  } else {
-
-    videoArea.classList.remove(
-      "audio-mode"
-    );
-
-    callType.textContent =
-      "Video Call";
-
-  }
-
-
-  callerName.textContent =
-    currentCall
-      ? currentCall.peer
-      : "Connected";
-
-
-  startTimer();
-
-}
-
-
-/* ============================================================
-   REMOTE STREAM
-============================================================ */
-
-function attachRemoteStream(
-  stream
-) {
-
-  remoteVideo.srcObject =
-    stream;
-
-
-  remoteVideo
-    .play()
-    .catch(
-      error => {
-
-        console.log(
-          "Autoplay:",
-          error
-        );
-
-      }
-    );
-
-
-  if (
-    currentCallType === "video" &&
-    localStream
-  ) {
-
-    localVideo.srcObject =
-      localStream;
-
-  }
-
-}
-
-
-/* ============================================================
-   MUTE
-============================================================ */
-
-function toggleMute() {
-
-  if (!localStream) {
-    return;
-  }
-
-
-  const tracks =
-    localStream.getAudioTracks();
-
-
-  if (!tracks.length) {
-    return;
-  }
-
-
-  isMuted =
-    !isMuted;
-
-
-  tracks.forEach(
-    track => {
-
-      track.enabled =
-        !isMuted;
-
-    }
-  );
-
-
-  if (isMuted) {
-
-    muteButton.innerHTML =
-      "🔇<small>Unmute</small>";
-
-    muteButton.classList.add(
-      "active"
-    );
-
-  } else {
-
-    muteButton.innerHTML =
-      "🎤<small>Mute</small>";
-
-    muteButton.classList.remove(
-      "active"
-    );
-
-  }
-
-}
-
-
-/* ============================================================
-   CAMERA
-============================================================ */
-
-function toggleCamera() {
-
-  if (!localStream) {
-    return;
-  }
-
-
-  const tracks =
-    localStream.getVideoTracks();
-
-
-  if (!tracks.length) {
-    return;
-  }
-
-
-  isCameraOff =
-    !isCameraOff;
-
-
-  tracks.forEach(
-    track => {
-
-      track.enabled =
-        !isCameraOff;
-
-    }
-  );
-
-
-  if (isCameraOff) {
-
-    cameraButton.innerHTML =
-      "🚫<small>Camera</small>";
-
-    cameraButton.classList.add(
-      "active"
-    );
-
-  } else {
-
-    cameraButton.innerHTML =
-      "📷<small>Camera</small>";
-
-    cameraButton.classList.remove(
-      "active"
-    );
-
-  }
-
-}
-
-
-/* ============================================================
-   END CALL
-============================================================ */
-
-function endCall() {
-
-  if (currentCall) {
-
-    try {
-
-      currentCall.close();
+      });
 
     } catch (error) {
 
       console.error(
+        "Could not create status message connection:",
         error
       );
+    }
+  }
 
+
+  function handleCallStatusData(data) {
+
+    if (!data || !data.type) {
+      return;
     }
 
-  }
-
-
-  finishCall(
-    "Call ended."
-  );
-
-}
-
-
-/* ============================================================
-   FINISH CALL
-============================================================ */
-
-function finishCall(
-  text = ""
-) {
-
-  stopLocalStream();
-
-  stopTimer();
-
-
-  if (currentCall) {
-
-    try {
-
-      currentCall.close();
-
-    } catch (error) {}
-
-  }
-
-
-  currentCall =
-    null;
-
-  remoteStream =
-    null;
-
-
-  closeCallStatusConnection();
-
-
-  remoteVideo.srcObject =
-    null;
-
-  localVideo.srcObject =
-    null;
-
-
-  callScreen.classList.remove(
-    "show"
-  );
-
-
-  videoArea.classList.remove(
-    "audio-mode"
-  );
-
-
-  isMuted =
-    false;
-
-  isCameraOff =
-    false;
-
-
-  muteButton.innerHTML =
-    "🎤<small>Mute</small>";
-
-  cameraButton.innerHTML =
-    "📷<small>Camera</small>";
-
-
-  muteButton.classList.remove(
-    "active"
-  );
-
-  cameraButton.classList.remove(
-    "active"
-  );
-
-
-  if (text) {
-
-    showMessage(
-      text,
-      "info"
+    console.log(
+      "Call status received:",
+      data
     );
 
-  }
 
-}
+    if (data.type === "declined") {
 
+      outgoingCallPending = false;
 
-/* ============================================================
-   STOP MEDIA
-============================================================ */
-
-function stopLocalStream() {
-
-  if (!localStream) {
-    return;
-  }
-
-
-  localStream
-    .getTracks()
-    .forEach(
-      track => {
+      if (currentCall) {
 
         try {
-
-          track.stop();
-
-        } catch (error) {}
-
+          currentCall.close();
+        } catch (error) {
+          console.error(error);
+        }
       }
-    );
 
+      currentCall = null;
 
-  localStream =
-    null;
+      cleanupMedia();
 
-}
+      hideOutgoingCallingScreen();
 
+      closeCallStatusConnection();
 
-/* ============================================================
-   TIMER
-============================================================ */
+      if (data.reason === "busy") {
 
-function startTimer() {
+        showMessage(
+          "The person is currently on another call.",
+          "info"
+        );
 
-  stopTimer();
+      } else {
 
-
-  timerStart =
-    Date.now();
-
-
-  updateTimer();
-
-
-  timerInterval =
-    setInterval(
-      updateTimer,
-      1000
-    );
-
-}
-
-
-function updateTimer() {
-
-  if (!timerStart) {
-    return;
+        showMessage(
+          "Call declined.",
+          "info"
+        );
+      }
+    }
   }
 
 
-  const seconds =
-    Math.floor(
-      (Date.now() - timerStart) / 1000
-    );
+  function closeCallStatusConnection() {
 
+    if (callStatusConnection) {
 
-  const minutes =
-    Math.floor(seconds / 60)
-      .toString()
-      .padStart(2, "0");
+      try {
+        callStatusConnection.close();
+      } catch (error) {
+        console.error(error);
+      }
+    }
 
-
-  const remaining =
-    (seconds % 60)
-      .toString()
-      .padStart(2, "0");
-
-
-  timer.textContent =
-    minutes + ":" + remaining;
-
-}
-
-
-function stopTimer() {
-
-  if (timerInterval) {
-
-    clearInterval(
-      timerInterval
-    );
-
+    callStatusConnection = null;
   }
 
 
-  timerInterval =
-    null;
+  /* =========================================================
+     PEER ERRORS
+  ========================================================= */
 
-  timerStart =
-    null;
+  function handlePeerError(error) {
 
-  timer.textContent =
-    "00:00";
+    console.error("PeerJS error:", error);
 
-}
+    if (
+      error &&
+      error.type === "peer-unavailable"
+    ) {
+
+      if (outgoingCallPending) {
+
+        outgoingCallPending = false;
+
+        if (currentCall) {
+          try {
+            currentCall.close();
+          } catch (closeError) {
+            console.error(closeError);
+          }
+        }
+
+        currentCall = null;
+
+        cleanupMedia();
+
+        hideOutgoingCallingScreen();
+
+        showMessage(
+          "Peer ID unavailable. Check the Peer ID and try again.",
+          "error"
+        );
+
+      } else {
+
+        showMessage(
+          "Peer ID unavailable.",
+          "error"
+        );
+      }
+
+      return;
+    }
 
 
-/* ============================================================
-   PEER DISCONNECTED
-============================================================ */
+    if (
+      error &&
+      error.type === "unavailable-id"
+    ) {
 
-function handleDisconnected() {
+      setStatus(
+        "Peer ID unavailable",
+        "error"
+      );
 
-  console.warn(
-    "PeerJS disconnected."
-  );
-
-
-  peerReady =
-    false;
-
-
-  audioButton.disabled =
-    true;
-
-  videoButton.disabled =
-    true;
+      return;
+    }
 
 
-  setStatus(
-    "offline",
-    "Connection Lost",
-    "Trying to reconnect…"
-  );
+    if (
+      error &&
+      (
+        error.type === "network" ||
+        error.type === "server-error" ||
+        error.type === "socket-error" ||
+        error.type === "socket-closed"
+      )
+    ) {
+
+      setStatus(
+        "Connection problem",
+        "error"
+      );
+
+      if (outgoingCallPending) {
+
+        outgoingCallPending = false;
+
+        cleanupMedia();
+
+        if (currentCall) {
+          try {
+            currentCall.close();
+          } catch (closeError) {
+            console.error(closeError);
+          }
+        }
+
+        currentCall = null;
+
+        hideOutgoingCallingScreen();
+
+        showMessage(
+          "Connection failed. Please try again.",
+          "error"
+        );
+      }
+
+      return;
+    }
 
 
-  setTimeout(
-    () => {
+    if (
+      error &&
+      error.type === "ssl-unavailable"
+    ) {
+
+      showMessage(
+        "Secure connection is unavailable.",
+        "error"
+      );
+
+      return;
+    }
+
+
+    if (
+      error &&
+      error.type === "browser-incompatible"
+    ) {
+
+      showMessage(
+        "This browser does not support the required calling features.",
+        "error"
+      );
+
+      return;
+    }
+
+    showMessage(
+      "A connection error occurred. Please try again.",
+      "error"
+    );
+  }
+
+
+  /* =========================================================
+     MEDIA ERRORS
+  ========================================================= */
+
+  function handleMediaError(error) {
+
+    console.error("Media error:", error);
+
+    cleanupMedia();
+
+    if (!error) {
+      return "Could not access your microphone or camera.";
+    }
+
+    if (error.name === "NotAllowedError") {
+
+      return "Microphone or camera permission was denied. Please allow access and try again.";
+    }
+
+    if (error.name === "NotFoundError") {
+
+      return "No microphone or camera was found.";
+    }
+
+    if (error.name === "NotReadableError") {
+
+      return "Your microphone or camera is already being used by another application.";
+    }
+
+    return "Could not access your microphone or camera.";
+  }
+
+
+  function getMediaErrorMessage(error) {
+
+    if (
+      error &&
+      (
+        error.name === "NotAllowedError" ||
+        error.name === "NotFoundError" ||
+        error.name === "NotReadableError"
+      )
+    ) {
+      return handleMediaError(error);
+    }
+
+    return error?.message ||
+      "Could not start the call.";
+  }
+
+
+  function handleCallError(error) {
+
+    console.error(
+      "Call connection error:",
+      error
+    );
+
+    cleanupMedia();
+
+    currentCall = null;
+
+    hideOutgoingCallingScreen();
+
+    if (
+      error &&
+      error.type === "peer-unavailable"
+    ) {
+
+      showMessage(
+        "Peer ID unavailable. Check the Peer ID and try again.",
+        "error"
+      );
+
+    } else {
+
+      showMessage(
+        "Connection failed. Please try again.",
+        "error"
+      );
+    }
+  }
+
+
+  /* =========================================================
+     PEER RECONNECTION
+  ========================================================= */
+
+  function handleDisconnected() {
+
+    setStatus(
+      "Reconnecting...",
+      "warning"
+    );
+
+    disableCallButtons();
+
+    setTimeout(() => {
 
       if (
         peer &&
-        peer.disconnected &&
-        !peer.destroyed
+        !peer.destroyed &&
+        !peer.open
       ) {
 
         try {
-
           peer.reconnect();
-
         } catch (error) {
-
-          console.error(
-            error
-          );
-
+          console.error(error);
         }
-
       }
 
-    },
-    1500
-  );
-
-}
-
-
-/* ============================================================
-   PEER CLOSE
-============================================================ */
-
-function handlePeerClose() {
-
-  peerReady =
-    false;
-
-
-  audioButton.disabled =
-    true;
-
-  videoButton.disabled =
-    true;
-
-
-  setStatus(
-    "offline",
-    "Offline",
-    "Peer connection closed"
-  );
-
-}
-
-
-/* ============================================================
-   PEER ERRORS
-============================================================ */
-
-function handlePeerError(
-  error
-) {
-
-  console.error(
-    "PeerJS error:",
-    error
-  );
-
-
-  let text =
-    error.message ||
-    "An unexpected PeerJS error occurred.";
-
-
-  switch (
-    error.type
-  ) {
-
-    case "peer-unavailable":
-
-      text =
-        "That Peer ID is currently offline or does not exist.";
-
-      break;
-
-
-    case "unavailable-id":
-
-      text =
-        "This Peer ID is already being used. Please reload the page.";
-
-      break;
-
-
-    case "network":
-
-      text =
-        "Network connection problem. Check your internet connection.";
-
-      break;
-
-
-    case "server-error":
-
-      text =
-        "The PeerJS signaling server returned an error.";
-
-      break;
-
-
-    case "socket-error":
-
-      text =
-        "Could not connect to the PeerJS signaling server.";
-
-      break;
-
-
-    case "socket-closed":
-
-      text =
-        "The PeerJS connection was closed.";
-
-      break;
-
-
-    case "ssl-unavailable":
-
-      text =
-        "A secure PeerJS connection could not be established.";
-
-      break;
-
-
-    case "browser-incompatible":
-
-      text =
-        "This browser does not support the required WebRTC features.";
-
-      break;
-
+    }, 1500);
   }
 
 
-  setStatus(
-    "offline",
-    "Connection Error",
-    text
-  );
+  /* =========================================================
+     BEFORE UNLOAD
+  ========================================================= */
 
+  window.addEventListener("beforeunload", () => {
 
-  showMessage(
-    text,
-    "error"
-  );
+    stopCallTimer();
 
-}
-
-
-/* ============================================================
-   MEDIA ERROR
-============================================================ */
-
-function handleMediaError(
-  error
-) {
-
-  console.error(
-    "Media error:",
-    error
-  );
-
-
-  let text =
-    "Could not access the microphone or camera.";
-
-
-  if (
-    error.name ===
-    "NotAllowedError"
-  ) {
-
-    text =
-      "Microphone/camera permission was denied. Allow permission in your browser and try again.";
-
-  }
-
-
-  if (
-    error.name ===
-    "NotFoundError"
-  ) {
-
-    text =
-      "No suitable microphone or camera was found.";
-
-  }
-
-
-  if (
-    error.name ===
-    "NotReadableError"
-  ) {
-
-    text =
-      "Your microphone or camera is being used by another application.";
-
-  }
-
-
-  showMessage(
-    text,
-    "error"
-  );
-
-}
-
-
-/* ============================================================
-   STATUS
-============================================================ */
-
-function setStatus(
-  type,
-  title,
-  description
-) {
-
-  statusDot.className =
-    "status-dot " + type;
-
-  statusTitle.textContent =
-    title;
-
-  statusDescription.textContent =
-    description;
-
-}
-
-
-/* ============================================================
-   MESSAGE
-============================================================ */
-
-function showMessage(
-  text,
-  type = "info"
-) {
-
-  message.textContent =
-    text;
-
-  message.className =
-    "message show " + type;
-
-}
-
-
-/* ============================================================
-   PAGE CLEANUP
-============================================================ */
-
-window.addEventListener(
-  "beforeunload",
-  () => {
-
-    stopLocalStream();
-
+    cleanupMedia();
 
     if (currentCall) {
 
       try {
-
         currentCall.close();
-
-      } catch (error) {}
-
+      } catch (error) {
+        console.error(error);
+      }
     }
 
-
     closeCallStatusConnection();
-
 
     if (peer) {
 
       try {
-
         peer.destroy();
-
-      } catch (error) {}
-
+      } catch (error) {
+        console.error(error);
+      }
     }
+  });
 
-  }
-);
+
+  /* =========================================================
+     START
+  ========================================================= */
+
+  initializePeer();
 
 </script>
 
