@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+
   <meta
     name="viewport"
     content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
@@ -73,38 +74,6 @@
     .container {
       width: 100%;
       max-width: 540px;
-    }
-
-    /* HEADER */
-
-    .header {
-      text-align: center;
-      margin-bottom: 16px;
-    }
-
-    .logo {
-      width: 64px;
-      height: 64px;
-      margin: 0 auto 10px;
-      border-radius: 20px;
-      background: #e8efff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 30px;
-      box-shadow: 0 8px 25px rgba(37, 99, 235, 0.12);
-    }
-
-    .header h1 {
-      margin: 0;
-      font-size: 26px;
-      letter-spacing: -0.5px;
-    }
-
-    .header p {
-      margin: 6px 0 0;
-      color: var(--muted);
-      font-size: 14px;
     }
 
     /* STATUS */
@@ -340,16 +309,6 @@
       border: 1px solid #bbf7d0;
     }
 
-    /* FOOTER */
-
-    .footer {
-      text-align: center;
-      color: #8b95a7;
-      font-size: 11px;
-      margin-top: 13px;
-      line-height: 1.5;
-    }
-
     /* INCOMING CALL */
 
     .incoming-overlay {
@@ -575,6 +534,7 @@
     }
 
     @media (max-width: 430px) {
+
       .app {
         padding: 12px;
       }
@@ -582,15 +542,6 @@
       .card {
         padding: 18px;
         border-radius: 21px;
-      }
-
-      .header h1 {
-        font-size: 24px;
-      }
-
-      .logo {
-        width: 58px;
-        height: 58px;
       }
 
       .call-button {
@@ -611,6 +562,7 @@
         width: 62px;
         height: 52px;
       }
+
     }
   </style>
 </head>
@@ -621,8 +573,8 @@
 
   <main class="container">
 
-
     <!-- STATUS -->
+
     <div class="status">
 
       <div
@@ -652,9 +604,11 @@
 
 
     <!-- MAIN CARD -->
+
     <section class="card">
 
       <!-- YOUR PEER ID -->
+
       <div class="section-title">
         Your Peer ID
       </div>
@@ -686,6 +640,7 @@
 
 
       <!-- REMOTE PEER ID -->
+
       <div class="section-title">
         Enter Peer ID to Call
       </div>
@@ -705,6 +660,7 @@
 
 
       <!-- CALL BUTTONS -->
+
       <div class="call-buttons">
 
         <button
@@ -746,6 +702,7 @@
 
 
       <!-- MESSAGE -->
+
       <div
         id="message"
         class="message"
@@ -753,15 +710,12 @@
 
     </section>
 
-
   </main>
 
 </div>
 
 
-<!-- ============================
-     INCOMING CALL
-============================= -->
+<!-- INCOMING CALL -->
 
 <div
   id="incomingOverlay"
@@ -815,9 +769,7 @@
 </div>
 
 
-<!-- ============================
-     ACTIVE CALL
-============================= -->
+<!-- ACTIVE CALL -->
 
 <div
   id="callScreen"
@@ -945,6 +897,12 @@ let timerInterval = null;
 
 let peerReady = false;
 
+/*
+  Separate PeerJS DataConnection used only for
+  call status messages such as "declined".
+*/
+let callStatusConnection = null;
+
 
 /* ============================================================
    DOM
@@ -1043,13 +1001,6 @@ function initialize() {
 
 function createPeer() {
 
-  /*
-    No ID is supplied here.
-
-    PeerJS generates a unique temporary Peer ID
-    for this browser session.
-  */
-
   peer =
     new Peer({
       debug: 1
@@ -1065,6 +1016,18 @@ function createPeer() {
   peer.on(
     "call",
     handleIncomingCall
+  );
+
+
+  /*
+    Receive DataConnections.
+
+    These are used for call-status messages.
+  */
+
+  peer.on(
+    "connection",
+    handleIncomingDataConnection
   );
 
 
@@ -1100,7 +1063,8 @@ function handlePeerOpen(id) {
   );
 
 
-  peerReady = true;
+  peerReady =
+    true;
 
 
   myPeerId.value =
@@ -1160,11 +1124,6 @@ async function copyPeerId() {
     );
 
   } catch (error) {
-
-    /*
-      Fallback for browsers where
-      clipboard API is unavailable.
-    */
 
     myPeerId.select();
 
@@ -1261,6 +1220,18 @@ async function startCall(type) {
   }
 
 
+  /*
+    Create a separate reliable data connection
+    for call-status messages.
+
+    The media call remains independent.
+  */
+
+  createOutgoingStatusConnection(
+    destination
+  );
+
+
   showMessage(
     "Calling " + destination + "…",
     "info"
@@ -1283,6 +1254,8 @@ async function startCall(type) {
 
     stopLocalStream();
 
+    closeCallStatusConnection();
+
     showMessage(
       "The call could not be started.",
       "error"
@@ -1301,10 +1274,178 @@ async function startCall(type) {
 
 
 /* ============================================================
+   OUTGOING STATUS CONNECTION
+============================================================ */
+
+function createOutgoingStatusConnection(
+  destination
+) {
+
+  try {
+
+    callStatusConnection =
+      peer.connect(
+        destination,
+        {
+          label: "call-status",
+          reliable: true,
+          serialization: "json"
+        }
+      );
+
+
+    callStatusConnection.on(
+      "open",
+      () => {
+
+        console.log(
+          "Call status connection opened."
+        );
+
+      }
+    );
+
+
+    callStatusConnection.on(
+      "data",
+      handleCallStatusData
+    );
+
+
+    callStatusConnection.on(
+      "error",
+      error => {
+
+        console.error(
+          "Call status connection error:",
+          error
+        );
+
+      }
+    );
+
+
+    callStatusConnection.on(
+      "close",
+      () => {
+
+        console.log(
+          "Call status connection closed."
+        );
+
+      }
+    );
+
+  } catch (error) {
+
+    console.error(
+      "Could not create status connection:",
+      error
+    );
+
+  }
+
+}
+
+
+/* ============================================================
+   INCOMING DATA CONNECTION
+============================================================ */
+
+function handleIncomingDataConnection(
+  connection
+) {
+
+  console.log(
+    "Incoming data connection from:",
+    connection.peer
+  );
+
+
+  connection.on(
+    "data",
+    data => {
+
+      handleCallStatusData(
+        data
+      );
+
+    }
+  );
+
+
+  connection.on(
+    "open",
+    () => {
+
+      /*
+        If this is a status connection for an
+        incoming call, keep it available.
+      */
+
+      if (
+        connection.label ===
+        "call-status"
+      ) {
+
+        callStatusConnection =
+          connection;
+
+      }
+
+    }
+  );
+
+
+  connection.on(
+    "error",
+    error => {
+
+      console.error(
+        "Incoming data connection error:",
+        error
+      );
+
+    }
+  );
+
+}
+
+
+/* ============================================================
+   CALL STATUS DATA
+============================================================ */
+
+function handleCallStatusData(
+  data
+) {
+
+  if (!data || !data.type) {
+    return;
+  }
+
+
+  if (
+    data.type ===
+    "declined"
+  ) {
+
+    finishCall(
+      "Call declined."
+    );
+
+  }
+
+}
+
+
+/* ============================================================
    OUTGOING CALL
 ============================================================ */
 
-function configureOutgoingCall(call) {
+function configureOutgoingCall(
+  call
+) {
 
   call.on(
     "stream",
@@ -1327,9 +1468,21 @@ function configureOutgoingCall(call) {
     "close",
     () => {
 
-      finishCall(
-        "The other person ended the call."
-      );
+      /*
+        Do not overwrite the "Call declined"
+        message if the status message already
+        handled the call.
+      */
+
+      if (
+        currentCall === call
+      ) {
+
+        finishCall(
+          "The other person ended the call."
+        );
+
+      }
 
     }
   );
@@ -1361,7 +1514,9 @@ function configureOutgoingCall(call) {
    INCOMING CALL
 ============================================================ */
 
-function handleIncomingCall(call) {
+function handleIncomingCall(
+  call
+) {
 
   console.log(
     "Incoming call from:",
@@ -1370,12 +1525,25 @@ function handleIncomingCall(call) {
 
 
   /*
-    If already in a call, reject automatically.
+    If already in a call, automatically reject.
   */
 
   if (currentCall) {
 
     call.close();
+
+    /*
+      Tell caller that the person is busy.
+      This is separate from manual rejection.
+    */
+
+    sendStatusMessage(
+      call.peer,
+      {
+        type: "declined",
+        reason: "busy"
+      }
+    );
 
     return;
 
@@ -1485,9 +1653,15 @@ async function acceptCall() {
     "close",
     () => {
 
-      finishCall(
-        "The other person ended the call."
-      );
+      if (
+        currentCall === call
+      ) {
+
+        finishCall(
+          "The other person ended the call."
+        );
+
+      }
 
     }
   );
@@ -1516,40 +1690,44 @@ async function acceptCall() {
 
 
 /* ============================================================
-   REJECT
+   REJECT CALL
 ============================================================ */
 
 function rejectCall() {
 
-  if (incomingCall) {
+  if (!incomingCall) {
+    return;
+  }
 
-    try {
 
-      incomingCall.send({
-        type: "declined"
-      });
+  const callerId =
+    incomingCall.peer;
 
-    } catch (error) {
 
-      console.error(
-        "Could not send decline signal:",
-        error
-      );
+  /*
+    Send the decline message through a
+    separate PeerJS DataConnection.
+  */
 
+  sendStatusMessage(
+    callerId,
+    {
+      type: "declined",
+      reason: "rejected"
     }
+  );
 
 
-    try {
+  try {
 
-      incomingCall.close();
+    incomingCall.close();
 
-    } catch (error) {
+  } catch (error) {
 
-      console.error(
-        error
-      );
-
-    }
+    console.error(
+      "Could not close incoming call:",
+      error
+    );
 
   }
 
@@ -1570,15 +1748,39 @@ function rejectCall() {
 
 }
 
-  if (incomingCall) {
+
+/* ============================================================
+   SEND STATUS MESSAGE
+============================================================ */
+
+function sendStatusMessage(
+  destination,
+  data
+) {
+
+  /*
+    If an existing status connection belongs
+    to this destination and is open, use it.
+  */
+
+  if (
+    callStatusConnection &&
+    callStatusConnection.open &&
+    callStatusConnection.peer === destination
+  ) {
 
     try {
 
-      incomingCall.close();
+      callStatusConnection.send(
+        data
+      );
+
+      return;
 
     } catch (error) {
 
       console.error(
+        "Existing status connection failed:",
         error
       );
 
@@ -1587,19 +1789,114 @@ function rejectCall() {
   }
 
 
-  incomingCall =
+  /*
+    Otherwise create a temporary data connection
+    back to the caller.
+
+    This is especially useful when the receiver
+    rejects very quickly.
+  */
+
+  try {
+
+    const connection =
+      peer.connect(
+        destination,
+        {
+          label: "call-status",
+          reliable: true,
+          serialization: "json"
+        }
+      );
+
+
+    connection.on(
+      "open",
+      () => {
+
+        try {
+
+          connection.send(
+            data
+          );
+
+        } catch (error) {
+
+          console.error(
+            "Could not send status:",
+            error
+          );
+
+        }
+
+
+        /*
+          Give the message time to travel
+          before closing the connection.
+        */
+
+        setTimeout(
+          () => {
+
+            try {
+
+              connection.close();
+
+            } catch (error) {}
+
+          },
+          500
+        );
+
+      }
+    );
+
+
+    connection.on(
+      "error",
+      error => {
+
+        console.error(
+          "Status connection error:",
+          error
+        );
+
+      }
+    );
+
+  } catch (error) {
+
+    console.error(
+      "Could not create status connection:",
+      error
+    );
+
+  }
+
+}
+
+
+/* ============================================================
+   CLOSE STATUS CONNECTION
+============================================================ */
+
+function closeCallStatusConnection() {
+
+  if (
+    callStatusConnection
+  ) {
+
+    try {
+
+      callStatusConnection.close();
+
+    } catch (error) {}
+
+  }
+
+
+  callStatusConnection =
     null;
-
-
-  incomingOverlay.classList.remove(
-    "show"
-  );
-
-
-  showMessage(
-    "Call rejected.",
-    "info"
-  );
 
 }
 
@@ -1665,10 +1962,12 @@ function attachRemoteStream(
     .play()
     .catch(
       error => {
+
         console.log(
           "Autoplay:",
           error
         );
+
       }
     );
 
@@ -1712,8 +2011,10 @@ function toggleMute() {
 
   tracks.forEach(
     track => {
+
       track.enabled =
         !isMuted;
+
     }
   );
 
@@ -1767,8 +2068,10 @@ function toggleCamera() {
 
   tracks.forEach(
     track => {
+
       track.enabled =
         !isCameraOff;
+
     }
   );
 
@@ -1839,11 +2142,25 @@ function finishCall(
   stopTimer();
 
 
+  if (currentCall) {
+
+    try {
+
+      currentCall.close();
+
+    } catch (error) {}
+
+  }
+
+
   currentCall =
     null;
 
   remoteStream =
     null;
+
+
+  closeCallStatusConnection();
 
 
   remoteVideo.srcObject =
@@ -2098,7 +2415,9 @@ function handlePeerClose() {
    PEER ERRORS
 ============================================================ */
 
-function handlePeerError(error) {
+function handlePeerError(
+  error
+) {
 
   console.error(
     "PeerJS error:",
@@ -2111,7 +2430,9 @@ function handlePeerError(error) {
     "An unexpected PeerJS error occurred.";
 
 
-  switch (error.type) {
+  switch (
+    error.type
+  ) {
 
     case "peer-unavailable":
 
@@ -2198,7 +2519,9 @@ function handlePeerError(error) {
    MEDIA ERROR
 ============================================================ */
 
-function handleMediaError(error) {
+function handleMediaError(
+  error
+) {
 
   console.error(
     "Media error:",
@@ -2301,6 +2624,7 @@ window.addEventListener(
 
     stopLocalStream();
 
+
     if (currentCall) {
 
       try {
@@ -2310,6 +2634,9 @@ window.addEventListener(
       } catch (error) {}
 
     }
+
+
+    closeCallStatusConnection();
 
 
     if (peer) {
