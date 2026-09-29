@@ -124,8 +124,13 @@
       flex: 1;
     }
 
-    .incoming-peer-row .copy-btn {
+    .incoming-peer-row .copy-btn,
+    .incoming-peer-row .paste-btn {
       flex-shrink: 0;
+    }
+
+    .peer-input-row {
+      align-items: stretch;
     }
 
     input {
@@ -148,8 +153,10 @@
       background: #f9fafb;
     }
 
-    .copy-btn {
+    .copy-btn,
+    .paste-btn {
       flex-shrink: 0;
+      min-width: 76px;
       padding: 0 16px;
       border-radius: 10px;
       background: #111827;
@@ -613,7 +620,21 @@
         flex-direction: column;
       }
 
-      /* Keep incoming Peer ID and Copy button together */
+      .peer-input-row {
+        flex-direction: row;
+      }
+
+      .peer-input-row input {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .peer-input-row .paste-btn {
+        flex-shrink: 0;
+        height: 46px;
+      }
+
+      /* Keep incoming Peer ID and action buttons together */
       .incoming-peer-row {
         flex-direction: row;
       }
@@ -623,12 +644,16 @@
         min-width: 0;
       }
 
-      .incoming-peer-row .copy-btn {
+      .incoming-peer-row .copy-btn,
+      .incoming-peer-row .paste-btn {
         flex-shrink: 0;
+        min-width: 68px;
         height: 46px;
+        padding: 0 10px;
       }
 
-      .copy-btn {
+      .copy-btn,
+      .paste-btn {
         height: 44px;
       }
 
@@ -709,11 +734,23 @@
             Enter Peer ID to Call
           </div>
 
-          <input
-            id="remotePeerId"
-            type="text"
-            autocomplete="off"
-          >
+          <div class="input-row peer-input-row">
+
+            <input
+              id="remotePeerId"
+              type="text"
+              autocomplete="off"
+            >
+
+            <button
+              id="pasteBtn"
+              class="paste-btn"
+              type="button"
+            >
+              Paste
+            </button>
+
+          </div>
 
           <div class="help">
             Enter the other person's Peer ID.
@@ -792,8 +829,17 @@
         <button
           id="copyIncomingPeerBtn"
           class="copy-btn"
+          type="button"
         >
           Copy
+        </button>
+
+        <button
+          id="pasteIncomingPeerBtn"
+          class="paste-btn"
+          type="button"
+        >
+          Paste
         </button>
 
       </div>
@@ -1026,6 +1072,9 @@
     const copyBtn =
       document.getElementById("copyBtn");
 
+    const pasteBtn =
+      document.getElementById("pasteBtn");
+
     const audioCallBtn =
       document.getElementById("audioCallBtn");
 
@@ -1057,6 +1106,9 @@
 
     const copyIncomingPeerBtn =
       document.getElementById("copyIncomingPeerBtn");
+
+    const pasteIncomingPeerBtn =
+      document.getElementById("pasteIncomingPeerBtn");
 
     const acceptBtn =
       document.getElementById("acceptBtn");
@@ -1149,6 +1201,8 @@
 
 
     let outgoingCallPending = false;
+
+    let outgoingCancelInProgress = false;
 
 
     /* =========================================================
@@ -1367,6 +1421,70 @@
 
 
     /* =========================================================
+       PASTE PEER ID INTO CALL FIELD
+    ========================================================= */
+
+    async function pastePeerIdToCallField() {
+
+      try {
+
+        const text =
+          await navigator.clipboard.readText();
+
+        const id =
+          text.trim();
+
+        if (!id) {
+
+          showMessage(
+            "Clipboard is empty.",
+            "error"
+          );
+
+          return;
+        }
+
+        remotePeerIdInput.value = id;
+        remotePeerIdInput.focus();
+        remotePeerIdInput.select();
+
+        showMessage(
+          "Peer ID pasted into the call field.",
+          "success"
+        );
+
+      } catch (error) {
+
+        console.error(
+          "Clipboard read failed:",
+          error
+        );
+
+        remotePeerIdInput.focus();
+
+        showMessage(
+          "Could not read the clipboard. Please allow clipboard access or paste manually.",
+          "error"
+        );
+
+      }
+
+    }
+
+
+    pasteBtn.addEventListener(
+      "click",
+      pastePeerIdToCallField
+    );
+
+
+    pasteIncomingPeerBtn.addEventListener(
+      "click",
+      pastePeerIdToCallField
+    );
+
+
+    /* =========================================================
        COPY INCOMING CALLER PEER ID
     ========================================================= */
 
@@ -1470,6 +1588,8 @@
         return;
 
       }
+
+      outgoingCancelInProgress = false;
 
 
       const destination =
@@ -1619,6 +1739,12 @@
         "close",
         () => {
 
+          if (outgoingCancelInProgress) {
+            outgoingCancelInProgress = false;
+            return;
+          }
+
+
           if (outgoingCallPending) {
 
             outgoingCallPending =
@@ -1722,48 +1848,78 @@
 
     }
 
-
+    
     cancelCallBtn.addEventListener(
-      "click",
-      () => {
+  "click",
+  () => {
 
-        outgoingCallPending =
-          false;
+    const destination =
+      currentRemotePeerId;
 
 
-        if (currentCall) {
+    outgoingCallPending =
+      false;
 
-          try {
+    outgoingCancelInProgress = true;
 
-            currentCall.close();
 
-          } catch (error) {
+    /*
+     * Tell the receiver that the caller
+     * cancelled before the call was answered.
+     */
+    if (destination) {
 
-            console.error(error);
-
-          }
-
+      sendStatusMessage(
+        destination,
+        {
+          type: "cancelled"
         }
+      );
+
+    }
 
 
-        currentCall =
-          null;
+    if (currentCall) {
 
+      try {
 
-        closeCallStatusConnection();
+        currentCall.close();
 
-        cleanupMedia();
+      } catch (error) {
 
-        hideOutgoingCallingScreen();
-
-
-        showMessage(
-          "Call cancelled.",
-          "info"
-        );
+        console.error(error);
 
       }
+
+    }
+
+
+    currentCall =
+      null;
+
+    currentRemotePeerId =
+      null;
+
+
+    setTimeout(
+      () => {
+        closeCallStatusConnection();
+      },
+      700
     );
+
+    cleanupMedia();
+
+    hideOutgoingCallingScreen();
+
+
+    showMessage(
+      "Call cancelled.",
+      "info"
+    );
+
+  }
+);
 
 
     /* =========================================================
@@ -2926,6 +3082,43 @@
       );
 
 
+      /*
+       * Caller cancelled before the receiver answered.
+       */
+      if (
+        data.type ===
+        "cancelled"
+      ) {
+
+        if (incomingCall) {
+
+          try {
+            incomingCall.close();
+          } catch (error) {
+            console.error(error);
+          }
+
+        }
+
+        incomingCall =
+          null;
+
+        incomingOverlay.classList.remove(
+          "show"
+        );
+
+        closeCallStatusConnection();
+
+        showMessage(
+          "Call cancelled.",
+          "info"
+        );
+
+        return;
+
+      }
+
+
       if (
         data.type ===
         "declined"
@@ -3456,4 +3649,3 @@
 
 </body>
 </html>
-```
