@@ -690,14 +690,29 @@
 
       <h2>Incoming Call</h2>
 
-      <p>
-        From:
-        <strong id="incomingPeerId"></strong>
-      </p>
+     <p>
+  From:
+  <strong id="incomingPeerId"></strong>
+</p>
 
-      <p id="incomingCallType">
-        Audio Call
-      </p>
+<div class="input-row incoming-peer-row">
+  <input
+    id="incomingPeerIdInput"
+    type="text"
+    readonly
+  >
+
+  <button
+    id="copyIncomingPeerBtn"
+    class="copy-btn"
+  >
+    Copy
+  </button>
+</div>
+
+<p id="incomingCallType">
+  Audio Call
+</p>
 
       <div class="incoming-buttons">
 
@@ -899,7 +914,9 @@
 
   const incomingOverlay = document.getElementById("incomingOverlay");
   const incomingPeerId = document.getElementById("incomingPeerId");
+  const incomingPeerIdInput = document.getElementById("incomingPeerIdInput");
   const incomingCallType = document.getElementById("incomingCallType");
+  const copyIncomingPeerBtn = document.getElementById("copyIncomingPeerBtn");
   const acceptBtn = document.getElementById("acceptBtn");
   const rejectBtn = document.getElementById("rejectBtn");
 
@@ -1071,6 +1088,40 @@
     }
 
   });
+
+
+  /* ADD THIS CODE DIRECTLY BELOW */
+
+  copyIncomingPeerBtn.addEventListener("click", async () => {
+
+  const id = incomingPeerIdInput.value;
+
+  if (!id) return;
+
+  try {
+
+    await navigator.clipboard.writeText(id);
+
+    copyIncomingPeerBtn.textContent = "✓ Copied";
+
+    setTimeout(() => {
+      copyIncomingPeerBtn.textContent = "Copy";
+    }, 1500);
+
+  } catch (error) {
+
+    incomingPeerIdInput.select();
+    document.execCommand("copy");
+
+    copyIncomingPeerBtn.textContent = "✓ Copied";
+
+    setTimeout(() => {
+      copyIncomingPeerBtn.textContent = "Copy";
+    }, 1500);
+
+  }
+
+});
 
 
   /* =========================================================
@@ -1312,6 +1363,9 @@
       call.metadata?.callType || "audio";
 
     incomingPeerId.textContent =
+      call.peer;
+    
+    incomingPeerIdInput.value = 
       call.peer;
 
     incomingCallType.textContent =
