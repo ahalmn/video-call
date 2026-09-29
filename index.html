@@ -834,14 +834,6 @@
           Copy
         </button>
 
-        <button
-          id="pasteIncomingPeerBtn"
-          class="paste-btn"
-          type="button"
-        >
-          Paste
-        </button>
-
       </div>
 
 
@@ -1106,9 +1098,6 @@
 
     const copyIncomingPeerBtn =
       document.getElementById("copyIncomingPeerBtn");
-
-    const pasteIncomingPeerBtn =
-      document.getElementById("pasteIncomingPeerBtn");
 
     const acceptBtn =
       document.getElementById("acceptBtn");
@@ -1473,12 +1462,6 @@
 
 
     pasteBtn.addEventListener(
-      "click",
-      pastePeerIdToCallField
-    );
-
-
-    pasteIncomingPeerBtn.addEventListener(
       "click",
       pastePeerIdToCallField
     );
