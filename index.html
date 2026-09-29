@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>My Video Call</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #111;
+            color: white;
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+
+        h1 {
+            margin-bottom: 10px;
+        }
+
+        #myId {
+            word-break: break-all;
+            color: #8fd3ff;
+            margin: 15px;
+        }
+
+        #videos {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        video {
+            width: 45%;
+            min-width: 300px;
+            max-width: 600px;
+            background: black;
+            border-radius: 12px;
+        }
+
+        button {
+            border: none;
+            border-radius: 8px;
+            padding: 14px 24px;
+            margin: 6px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        #startButton {
+            background: #198754;
+            color: white;
+        }
+
+        #callButton {
+            background: #0d6efd;
+            color: white;
+        }
+
+        #endButton {
+            background: #dc3545;
+            color: white;
+        }
+
+        #status {
+            margin: 20px;
+            font-size: 18px;
+        }
+
+        input {
+            width: 90%;
+            max-width: 400px;
+            padding: 12px;
+            font-size: 16px;
+            border-radius: 6px;
+            border: none;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+    <h1>My Video Call</h1>
+
+    <div id="status">
+        Connecting to PeerJS...
+    </div>
+
+    <div>
+        <strong>My Peer ID:</strong>
+
+        <div id="myId">
+            Waiting...
+        </div>
+    </div>
+
+
+    <div>
+
+        <input
+            id="remoteId"
+            placeholder="Enter other person's Peer ID">
+
+    </div>
+
+
+    <div>
+
+        <button id="startButton">
+            Start Camera
+        </button>
+
+        <button id="callButton">
+            Call
+        </button>
+
+        <button id="endButton">
+            End Call
+        </button>
+
+    </div>
+
+
+    <div id="videos">
+
+        <div>
+
+            <p>My Camera</p>
+
+            <video
+                id="localVideo"
+                autoplay
+                muted
+                playsinline>
+            </video>
+
+        </div>
+
+
+        <div>
+
+            <p>Other Person</p>
+
+            <video
+                id="remoteVideo"
+                autoplay
+                playsinline>
+            </video>
+
+        </div>
+
+    </div>
+
+
+    <!-- PeerJS -->
+
+    <script src="https://unpkg.com/peerjs@1.5.5/dist/peerjs.min.js"></script>
+
+
+    <script>
+
+        let peer;
+
+        let localStream = null;
+
+        let currentCall = null;
+
+
+        /*
+         * Create a PeerJS connection.
+         *
+         * No host/key is specified,
+         * so PeerJS uses PeerJS Cloud.
+         */
+
+        peer = new Peer();
+
+
+        /*
+         * PeerJS gives this browser
+         * a unique Peer ID.
+         */
+
+        peer.on("open", function(id) {
+
+            console.log("My Peer ID:", id);
+
+            document.getElementById("myId")
+                .innerText = id;
+
+            document.getElementById("status")
+                .innerText =
+                "Ready.";
+
+        });
+
+
+        /*
+         * Error handling
+         */
+
+        peer.on("error", function(error) {
+
+            console.error("PeerJS error:", error);
+
+            document.getElementById("status")
+                .innerText =
+                "Error: " + error.type;
+
+        });
+
+
+        /*
+         * Receive incoming calls
+         */
+
+        peer.on("call", function(call) {
+
+            console.log("Incoming call");
+
+            document.getElementById("status")
+                .innerText =
+                "Incoming call...";
+
+            /*
+             * Make sure we have camera/microphone.
+             */
+
+            if (!localStream) {
+
+                document.getElementById("status")
+                    .innerText =
+                    "Start your camera before answering.";
+
+                return;
+            }
+
+
+            /*
+             * Answer the call.
+             */
+
+            call.answer(localStream);
+
+
+            /*
+             * Receive the other person's
+             * video/audio.
+             */
+
+            call.on("stream", function(remoteStream) {
+
+                document.getElementById("remoteVideo")
+                    .srcObject = remoteStream;
+
+                document.getElementById("status")
+                    .innerText =
+                    "Connected!";
+
+            });
+
+
+            currentCall = call;
+
+        });
+
+
+        /*
+         * START CAMERA
+         */
+
+        document.getElementById("startButton")
+            .addEventListener("click", async function() {
+
+                try {
+
+                    localStream =
+                        await navigator.mediaDevices
+                        .getUserMedia({
+
+                            video: true,
+
+                            audio: true
+
+                        });
+
+
+                    document.getElementById("localVideo")
+                        .srcObject = localStream;
+
+
+                    document.getElementById("status")
+                        .innerText =
+                        "Camera and microphone ready.";
+
+                }
+
+                catch (error) {
+
+                    console.error(error);
+
+                    document.getElementById("status")
+                        .innerText =
+                        "Could not access camera/microphone.";
+
+                }
+
+            });
+
+
+        /*
+         * CALL
+         */
+
+        document.getElementById("callButton")
+            .addEventListener("click", function() {
+
+                const remoteId =
+                    document.getElementById("remoteId")
+                    .value
+                    .trim();
+
+
+                if (!remoteId) {
+
+                    alert(
+                        "Enter the other person's Peer ID."
+                    );
+
+                    return;
+                }
+
+
+                if (!localStream) {
+
+                    alert(
+                        "Click Start Camera first."
+                    );
+
+                    return;
+                }
+
+
+                document.getElementById("status")
+                    .innerText =
+                    "Calling...";
+
+
+                /*
+                 * Start the WebRTC call.
+                 */
+
+                const call =
+                    peer.call(
+                        remoteId,
+                        localStream
+                    );
+
+
+                /*
+                 * Receive remote video/audio.
+                 */
+
+                call.on("stream", function(remoteStream) {
+
+                    document.getElementById("remoteVideo")
+                        .srcObject = remoteStream;
+
+                    document.getElementById("status")
+                        .innerText =
+                        "Connected!";
+
+                });
+
+
+                call.on("close", function() {
+
+                    document.getElementById("status")
+                        .innerText =
+                        "Call ended.";
+
+                });
+
+
+                call.on("error", function(error) {
+
+                    console.error(error);
+
+                    document.getElementById("status")
+                        .innerText =
+                        "Call error.";
+
+                });
+
+
+                currentCall = call;
+
+            });
+
+
+        /*
+         * END CALL
+         */
+
+        document.getElementById("endButton")
+            .addEventListener("click", function() {
+
+                if (currentCall) {
+
+                    currentCall.close();
+
+                    currentCall = null;
+
+                }
+
+
+                document.getElementById("remoteVideo")
+                    .srcObject = null;
+
+
+                document.getElementById("status")
+                    .innerText =
+                    "Call ended.";
+
+            });
+
+    </script>
+
+</body>
+
+</html>
