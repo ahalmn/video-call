@@ -1525,6 +1525,55 @@ function rejectCall() {
 
     try {
 
+      incomingCall.send({
+        type: "declined"
+      });
+
+    } catch (error) {
+
+      console.error(
+        "Could not send decline signal:",
+        error
+      );
+
+    }
+
+
+    try {
+
+      incomingCall.close();
+
+    } catch (error) {
+
+      console.error(
+        error
+      );
+
+    }
+
+  }
+
+
+  incomingCall =
+    null;
+
+
+  incomingOverlay.classList.remove(
+    "show"
+  );
+
+
+  showMessage(
+    "Call declined.",
+    "info"
+  );
+
+}
+
+  if (incomingCall) {
+
+    try {
+
       incomingCall.close();
 
     } catch (error) {
