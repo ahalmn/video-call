@@ -1,448 +1,1244 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
+  <meta charset="UTF-8">
 
-    <meta charset="UTF-8">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+  <title>Audio & Video Call</title>
 
-    <title>My Video Call</title>
+  <!-- PeerJS -->
+  <script src="https://unpkg.com/peerjs@1.5.5/dist/peerjs.min.js"></script>
 
-    <style>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
 
-        * {
-            box-sizing: border-box;
-        }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      color: #222;
+    }
 
-        body {
-            margin: 0;
-            padding: 20px;
-            background: #111;
-            color: white;
-            font-family: Arial, sans-serif;
-            text-align: center;
-        }
+    .container {
+      width: 100%;
+      max-width: 900px;
+      margin: auto;
+      padding: 20px;
+    }
 
-        h1 {
-            margin-bottom: 10px;
-        }
+    .card {
+      background: white;
+      border-radius: 18px;
+      padding: 25px;
+      box-shadow: 0 5px 25px rgba(0,0,0,0.08);
+      text-align: center;
+    }
 
-        #myId {
-            word-break: break-all;
-            color: #8fd3ff;
-            margin: 15px;
-        }
+    h1 {
+      margin-top: 0;
+      font-size: 30px;
+    }
 
-        #videos {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 15px;
-            flex-wrap: wrap;
-            margin-top: 20px;
-        }
+    .subtitle {
+      color: #666;
+      margin-bottom: 25px;
+    }
 
-        video {
-            width: 45%;
-            min-width: 300px;
-            max-width: 600px;
-            background: black;
-            border-radius: 12px;
-        }
+    .status {
+      background: #f1f3f5;
+      padding: 12px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      font-size: 14px;
+    }
 
-        button {
-            border: none;
-            border-radius: 8px;
-            padding: 14px 24px;
-            margin: 6px;
-            font-size: 16px;
-            cursor: pointer;
-        }
+    .buttons {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
 
-        #startButton {
-            background: #198754;
-            color: white;
-        }
+    button {
+      border: none;
+      border-radius: 12px;
+      padding: 15px 25px;
+      font-size: 16px;
+      cursor: pointer;
+      font-weight: bold;
+    }
 
-        #callButton {
-            background: #0d6efd;
-            color: white;
-        }
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
 
-        #endButton {
-            background: #dc3545;
-            color: white;
-        }
+    .audio-btn {
+      background: #2196f3;
+      color: white;
+    }
 
-        #status {
-            margin: 20px;
-            font-size: 18px;
-        }
+    .video-btn {
+      background: #673ab7;
+      color: white;
+    }
 
-        input {
-            width: 90%;
-            max-width: 400px;
-            padding: 12px;
-            font-size: 16px;
-            border-radius: 6px;
-            border: none;
-        }
+    .accept-btn {
+      background: #2e7d32;
+      color: white;
+    }
 
-    </style>
+    .reject-btn,
+    .end-btn {
+      background: #d32f2f;
+      color: white;
+    }
 
+    .secondary-btn {
+      background: #555;
+      color: white;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .incoming {
+      background: #fff3cd;
+      border: 1px solid #ffe69c;
+      border-radius: 15px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .incoming h2 {
+      margin-top: 0;
+    }
+
+    .call-type {
+      font-weight: bold;
+      font-size: 18px;
+      margin: 10px 0 20px;
+    }
+
+    .video-area {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      margin-top: 20px;
+    }
+
+    video {
+      width: 100%;
+      background: #111;
+      border-radius: 15px;
+      min-height: 220px;
+      object-fit: cover;
+    }
+
+    .video-label {
+      margin-bottom: 6px;
+      font-weight: bold;
+      text-align: left;
+    }
+
+    .call-controls {
+      margin-top: 20px;
+    }
+
+    .peer-id-box {
+      margin-top: 20px;
+      background: #f8f9fa;
+      padding: 15px;
+      border-radius: 10px;
+      word-break: break-all;
+      font-size: 13px;
+      color: #555;
+    }
+
+    input {
+      width: 100%;
+      padding: 14px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      margin: 10px 0;
+      font-size: 15px;
+    }
+
+    .small {
+      font-size: 13px;
+      color: #777;
+    }
+
+    @media (max-width: 700px) {
+      .video-area {
+        grid-template-columns: 1fr;
+      }
+
+      h1 {
+        font-size: 25px;
+      }
+
+      button {
+        width: 100%;
+      }
+    }
+  </style>
 </head>
-
 
 <body>
 
-    <h1>My Video Call</h1>
+<div class="container">
 
-    <div id="status">
-        Connecting to PeerJS...
+  <div class="card">
+
+    <h1>📞 Contact Me</h1>
+
+    <div class="subtitle">
+      Choose an audio or video call
     </div>
 
-    <div>
-        <strong>My Peer ID:</strong>
-
-        <div id="myId">
-            Waiting...
-        </div>
-    </div>
-
-
-    <div>
-
-        <input
-            id="remoteId"
-            placeholder="Enter other person's Peer ID">
-
+    <div id="status" class="status">
+      Connecting to call server...
     </div>
 
 
-    <div>
+    <!-- ========================= -->
+    <!-- CALLER SECTION -->
+    <!-- ========================= -->
 
-        <button id="startButton">
-            Start Camera
+    <div id="callerSection">
+
+      <h2>Start a Call</h2>
+
+      <input
+        type="text"
+        id="remotePeerId"
+        placeholder="Enter the other person's Peer ID"
+      >
+
+      <div class="buttons">
+
+        <button
+          id="audioCallBtn"
+          class="audio-btn"
+        >
+          🎤 Audio Call
         </button>
 
-        <button id="callButton">
-            Call
+        <button
+          id="videoCallBtn"
+          class="video-btn"
+        >
+          📹 Video Call
         </button>
 
-        <button id="endButton">
-            End Call
-        </button>
+      </div>
 
     </div>
 
 
-    <div id="videos">
+    <!-- ========================= -->
+    <!-- INCOMING CALL SECTION -->
+    <!-- ========================= -->
 
-        <div>
+    <div
+      id="incomingSection"
+      class="incoming hidden"
+    >
 
-            <p>My Camera</p>
+      <h2>📞 Incoming Call</h2>
 
-            <video
-                id="localVideo"
-                autoplay
-                muted
-                playsinline>
-            </video>
+      <div id="incomingCallType" class="call-type">
+        Someone is calling you
+      </div>
 
-        </div>
+      <div class="buttons">
 
+        <button
+          id="acceptBtn"
+          class="accept-btn"
+        >
+          ✅ Accept
+        </button>
 
-        <div>
+        <button
+          id="rejectBtn"
+          class="reject-btn"
+        >
+          ❌ Reject
+        </button>
 
-            <p>Other Person</p>
-
-            <video
-                id="remoteVideo"
-                autoplay
-                playsinline>
-            </video>
-
-        </div>
+      </div>
 
     </div>
 
 
-    <!-- PeerJS -->
+    <!-- ========================= -->
+    <!-- VIDEO SECTION -->
+    <!-- ========================= -->
 
-    <script src="https://unpkg.com/peerjs@1.5.5/dist/peerjs.min.js"></script>
+    <div
+      id="videoSection"
+      class="video-area hidden"
+    >
 
+      <div>
 
-    <script>
+        <div class="video-label">
+          Your Camera
+        </div>
 
-        let peer;
+        <video
+          id="localVideo"
+          autoplay
+          muted
+          playsinline
+        ></video>
 
-        let localStream = null;
-
-        let currentCall = null;
-
-
-        /*
-         * Create a PeerJS connection.
-         *
-         * No host/key is specified,
-         * so PeerJS uses PeerJS Cloud.
-         */
-
-        peer = new Peer();
-
-
-        /*
-         * PeerJS gives this browser
-         * a unique Peer ID.
-         */
-
-        peer.on("open", function(id) {
-
-            console.log("My Peer ID:", id);
-
-            document.getElementById("myId")
-                .innerText = id;
-
-            document.getElementById("status")
-                .innerText =
-                "Ready.";
-
-        });
+      </div>
 
 
-        /*
-         * Error handling
-         */
+      <div>
 
-        peer.on("error", function(error) {
+        <div class="video-label">
+          Other Person
+        </div>
 
-            console.error("PeerJS error:", error);
+        <video
+          id="remoteVideo"
+          autoplay
+          playsinline
+        ></video>
 
-            document.getElementById("status")
-                .innerText =
-                "Error: " + error.type;
+      </div>
 
-        });
+    </div>
 
 
-        /*
-         * Receive incoming calls
-         */
+    <!-- ========================= -->
+    <!-- AUDIO CALL INDICATOR -->
+    <!-- ========================= -->
 
-        peer.on("call", function(call) {
+    <div
+      id="audioSection"
+      class="hidden"
+      style="
+        margin-top:20px;
+        padding:30px;
+        background:#f1f3f5;
+        border-radius:15px;
+      "
+    >
 
-            console.log("Incoming call");
+      <div style="font-size:50px;">
+        🎤
+      </div>
 
-            document.getElementById("status")
-                .innerText =
-                "Incoming call...";
+      <h2>Audio Call</h2>
 
-            /*
-             * Make sure we have camera/microphone.
-             */
+      <p id="audioStatus">
+        Connected
+      </p>
 
-            if (!localStream) {
+    </div>
 
-                document.getElementById("status")
-                    .innerText =
-                    "Start your camera before answering.";
 
-                return;
+    <!-- ========================= -->
+    <!-- CALL CONTROLS -->
+    <!-- ========================= -->
+
+    <div
+      id="callControls"
+      class="call-controls hidden"
+    >
+
+      <div class="buttons">
+
+        <button
+          id="muteBtn"
+          class="secondary-btn"
+        >
+          🔇 Mute
+        </button>
+
+        <button
+          id="cameraBtn"
+          class="secondary-btn"
+        >
+          📷 Camera Off
+        </button>
+
+        <button
+          id="endBtn"
+          class="end-btn"
+        >
+          🔴 End Call
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <!-- ========================= -->
+    <!-- YOUR PEER ID -->
+    <!-- ========================= -->
+
+    <div class="peer-id-box">
+
+      <strong>Your Peer ID:</strong>
+
+      <div id="myPeerId">
+        Connecting...
+      </div>
+
+      <p class="small">
+        For this testing version, the caller needs this Peer ID.
+      </p>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<script>
+
+  // ==========================================
+  // VARIABLES
+  // ==========================================
+
+  let peer = null;
+
+  let localStream = null;
+
+  let currentCall = null;
+
+  let incomingCall = null;
+
+  let currentCallType = null;
+
+  let isMuted = false;
+
+  let isCameraOff = false;
+
+
+  // ==========================================
+  // HTML ELEMENTS
+  // ==========================================
+
+  const status =
+    document.getElementById("status");
+
+  const myPeerId =
+    document.getElementById("myPeerId");
+
+  const remotePeerId =
+    document.getElementById("remotePeerId");
+
+  const audioCallBtn =
+    document.getElementById("audioCallBtn");
+
+  const videoCallBtn =
+    document.getElementById("videoCallBtn");
+
+  const incomingSection =
+    document.getElementById("incomingSection");
+
+  const incomingCallType =
+    document.getElementById("incomingCallType");
+
+  const acceptBtn =
+    document.getElementById("acceptBtn");
+
+  const rejectBtn =
+    document.getElementById("rejectBtn");
+
+  const videoSection =
+    document.getElementById("videoSection");
+
+  const audioSection =
+    document.getElementById("audioSection");
+
+  const localVideo =
+    document.getElementById("localVideo");
+
+  const remoteVideo =
+    document.getElementById("remoteVideo");
+
+  const callControls =
+    document.getElementById("callControls");
+
+  const muteBtn =
+    document.getElementById("muteBtn");
+
+  const cameraBtn =
+    document.getElementById("cameraBtn");
+
+  const endBtn =
+    document.getElementById("endBtn");
+
+  const audioStatus =
+    document.getElementById("audioStatus");
+
+
+  // ==========================================
+  // CREATE PEER
+  // ==========================================
+
+  peer = new Peer();
+
+
+  // ==========================================
+  // PEER CONNECTED
+  // ==========================================
+
+  peer.on("open", function(id) {
+
+    myPeerId.textContent = id;
+
+    status.textContent =
+      "🟢 Ready to receive calls.";
+
+  });
+
+
+  // ==========================================
+  // INCOMING CALL
+  // ==========================================
+
+  peer.on("call", function(call) {
+
+    incomingCall = call;
+
+    const metadata =
+      call.metadata || {};
+
+    currentCallType =
+      metadata.callType || "video";
+
+
+    if (currentCallType === "audio") {
+
+      incomingCallType.textContent =
+        "🎤 Incoming Audio Call";
+
+    } else {
+
+      incomingCallType.textContent =
+        "📹 Incoming Video Call";
+
+    }
+
+
+    incomingSection.classList.remove("hidden");
+
+    status.textContent =
+      "📞 Someone is calling you.";
+
+  });
+
+
+  // ==========================================
+  // ACCEPT INCOMING CALL
+  // ==========================================
+
+  acceptBtn.addEventListener(
+    "click",
+    async function() {
+
+      if (!incomingCall) {
+        return;
+      }
+
+      try {
+
+        incomingSection.classList.add(
+          "hidden"
+        );
+
+        status.textContent =
+          "Connecting...";
+
+
+        if (currentCallType === "audio") {
+
+          await startLocalAudio();
+
+        } else {
+
+          await startLocalVideo();
+
+        }
+
+
+        currentCall =
+          incomingCall;
+
+
+        currentCall.answer(
+          localStream
+        );
+
+
+        setupCallEvents(
+          currentCall
+        );
+
+
+        incomingCall = null;
+
+      } catch (error) {
+
+        console.error(error);
+
+        status.textContent =
+          "Could not access microphone/camera.";
+
+      }
+
+    }
+  );
+
+
+  // ==========================================
+  // REJECT CALL
+  // ==========================================
+
+  rejectBtn.addEventListener(
+    "click",
+    function() {
+
+      if (incomingCall) {
+
+        incomingCall.close();
+
+        incomingCall = null;
+
+      }
+
+      incomingSection.classList.add(
+        "hidden"
+      );
+
+      status.textContent =
+        "Call rejected.";
+
+    }
+  );
+
+
+  // ==========================================
+  // AUDIO CALL BUTTON
+  // ==========================================
+
+  audioCallBtn.addEventListener(
+    "click",
+    async function() {
+
+      const remoteId =
+        remotePeerId.value.trim();
+
+
+      if (!remoteId) {
+
+        alert(
+          "Enter the other person's Peer ID first."
+        );
+
+        return;
+
+      }
+
+
+      try {
+
+        await startLocalAudio();
+
+
+        currentCallType =
+          "audio";
+
+
+        status.textContent =
+          "📞 Calling by audio...";
+
+
+        currentCall =
+          peer.call(
+            remoteId,
+            localStream,
+            {
+              metadata: {
+                callType: "audio"
+              }
             }
+          );
 
 
-            /*
-             * Answer the call.
-             */
+        setupCallEvents(
+          currentCall
+        );
 
-            call.answer(localStream);
+      } catch (error) {
 
+        console.error(error);
 
-            /*
-             * Receive the other person's
-             * video/audio.
-             */
+        status.textContent =
+          "Could not access microphone.";
 
-            call.on("stream", function(remoteStream) {
+      }
 
-                document.getElementById("remoteVideo")
-                    .srcObject = remoteStream;
+    }
+  );
 
-                document.getElementById("status")
-                    .innerText =
-                    "Connected!";
 
-            });
+  // ==========================================
+  // VIDEO CALL BUTTON
+  // ==========================================
 
+  videoCallBtn.addEventListener(
+    "click",
+    async function() {
 
-            currentCall = call;
+      const remoteId =
+        remotePeerId.value.trim();
 
-        });
 
+      if (!remoteId) {
 
-        /*
-         * START CAMERA
-         */
+        alert(
+          "Enter the other person's Peer ID first."
+        );
 
-        document.getElementById("startButton")
-            .addEventListener("click", async function() {
+        return;
 
-                try {
+      }
 
-                    localStream =
-                        await navigator.mediaDevices
-                        .getUserMedia({
 
-                            video: true,
+      try {
 
-                            audio: true
+        await startLocalVideo();
 
-                        });
 
+        currentCallType =
+          "video";
 
-                    document.getElementById("localVideo")
-                        .srcObject = localStream;
 
+        status.textContent =
+          "📹 Calling by video...";
 
-                    document.getElementById("status")
-                        .innerText =
-                        "Camera and microphone ready.";
 
-                }
+        currentCall =
+          peer.call(
+            remoteId,
+            localStream,
+            {
+              metadata: {
+                callType: "video"
+              }
+            }
+          );
 
-                catch (error) {
 
-                    console.error(error);
+        setupCallEvents(
+          currentCall
+        );
 
-                    document.getElementById("status")
-                        .innerText =
-                        "Could not access camera/microphone.";
+      } catch (error) {
 
-                }
+        console.error(error);
 
-            });
+        status.textContent =
+          "Could not access camera/microphone.";
 
+      }
 
-        /*
-         * CALL
-         */
+    }
+  );
 
-        document.getElementById("callButton")
-            .addEventListener("click", function() {
 
-                const remoteId =
-                    document.getElementById("remoteId")
-                    .value
-                    .trim();
+  // ==========================================
+  // START AUDIO
+  // ==========================================
 
+  async function startLocalAudio() {
 
-                if (!remoteId) {
+    stopLocalStream();
 
-                    alert(
-                        "Enter the other person's Peer ID."
-                    );
 
-                    return;
-                }
+    localStream =
+      await navigator.mediaDevices.getUserMedia(
+        {
+          audio: true,
+          video: false
+        }
+      );
 
 
-                if (!localStream) {
+    audioSection.classList.remove(
+      "hidden"
+    );
 
-                    alert(
-                        "Click Start Camera first."
-                    );
+    videoSection.classList.add(
+      "hidden"
+    );
 
-                    return;
-                }
+    callControls.classList.remove(
+      "hidden"
+    );
 
 
-                document.getElementById("status")
-                    .innerText =
-                    "Calling...";
+    localVideo.srcObject = null;
 
+  }
 
-                /*
-                 * Start the WebRTC call.
-                 */
 
-                const call =
-                    peer.call(
-                        remoteId,
-                        localStream
-                    );
+  // ==========================================
+  // START VIDEO
+  // ==========================================
 
+  async function startLocalVideo() {
 
-                /*
-                 * Receive remote video/audio.
-                 */
+    stopLocalStream();
 
-                call.on("stream", function(remoteStream) {
 
-                    document.getElementById("remoteVideo")
-                        .srcObject = remoteStream;
+    localStream =
+      await navigator.mediaDevices.getUserMedia(
+        {
+          audio: true,
+          video: true
+        }
+      );
 
-                    document.getElementById("status")
-                        .innerText =
-                        "Connected!";
 
-                });
+    localVideo.srcObject =
+      localStream;
 
 
-                call.on("close", function() {
+    videoSection.classList.remove(
+      "hidden"
+    );
 
-                    document.getElementById("status")
-                        .innerText =
-                        "Call ended.";
+    audioSection.classList.add(
+      "hidden"
+    );
 
-                });
+    callControls.classList.remove(
+      "hidden"
+    );
 
 
-                call.on("error", function(error) {
+    await localVideo.play();
 
-                    console.error(error);
+  }
 
-                    document.getElementById("status")
-                        .innerText =
-                        "Call error.";
 
-                });
+  // ==========================================
+  // CALL EVENTS
+  // ==========================================
 
+  function setupCallEvents(call) {
 
-                currentCall = call;
+    call.on(
+      "stream",
+      function(remoteStream) {
 
-            });
+        remoteVideo.srcObject =
+          remoteStream;
 
 
-        /*
-         * END CALL
-         */
+        if (
+          currentCallType === "video"
+        ) {
 
-        document.getElementById("endButton")
-            .addEventListener("click", function() {
+          videoSection.classList.remove(
+            "hidden"
+          );
 
-                if (currentCall) {
+          remoteVideo.play();
 
-                    currentCall.close();
+        } else {
 
-                    currentCall = null;
+          audioSection.classList.remove(
+            "hidden"
+          );
 
-                }
 
+          const audioPlayer =
+            document.getElementById(
+              "remoteAudio"
+            );
 
-                document.getElementById("remoteVideo")
-                    .srcObject = null;
 
+          if (audioPlayer) {
 
-                document.getElementById("status")
-                    .innerText =
-                    "Call ended.";
+            audioPlayer.srcObject =
+              remoteStream;
 
-            });
+          } else {
 
-    </script>
+            createRemoteAudio(
+              remoteStream
+            );
+
+          }
+
+        }
+
+
+        status.textContent =
+          "🟢 Call connected.";
+
+      }
+    );
+
+
+    call.on(
+      "close",
+      function() {
+
+        endCallUI();
+
+      }
+    );
+
+
+    call.on(
+      "error",
+      function(error) {
+
+        console.error(
+          "Call error:",
+          error
+        );
+
+        status.textContent =
+          "Call connection error.";
+
+        endCallUI();
+
+      }
+    );
+
+  }
+
+
+  // ==========================================
+  // CREATE AUDIO PLAYER
+  // ==========================================
+
+  function createRemoteAudio(
+    stream
+  ) {
+
+    const audio =
+      document.createElement(
+        "audio"
+      );
+
+
+    audio.id =
+      "remoteAudio";
+
+
+    audio.autoplay =
+      true;
+
+
+    audio.playsInline =
+      true;
+
+
+    audio.srcObject =
+      stream;
+
+
+    document.body.appendChild(
+      audio
+    );
+
+  }
+
+
+  // ==========================================
+  // MUTE / UNMUTE
+  // ==========================================
+
+  muteBtn.addEventListener(
+    "click",
+    function() {
+
+      if (!localStream) {
+        return;
+      }
+
+
+      const audioTracks =
+        localStream.getAudioTracks();
+
+
+      if (audioTracks.length === 0) {
+        return;
+      }
+
+
+      isMuted =
+        !isMuted;
+
+
+      audioTracks.forEach(
+        function(track) {
+
+          track.enabled =
+            !isMuted;
+
+        }
+      );
+
+
+      muteBtn.textContent =
+        isMuted
+          ? "🔊 Unmute"
+          : "🔇 Mute";
+
+    }
+  );
+
+
+  // ==========================================
+  // CAMERA ON/OFF
+  // ==========================================
+
+  cameraBtn.addEventListener(
+    "click",
+    function() {
+
+      if (!localStream) {
+        return;
+      }
+
+
+      const videoTracks =
+        localStream.getVideoTracks();
+
+
+      if (videoTracks.length === 0) {
+
+        return;
+
+      }
+
+
+      isCameraOff =
+        !isCameraOff;
+
+
+      videoTracks.forEach(
+        function(track) {
+
+          track.enabled =
+            !isCameraOff;
+
+        }
+      );
+
+
+      cameraBtn.textContent =
+        isCameraOff
+          ? "📷 Camera On"
+          : "📷 Camera Off";
+
+    }
+  );
+
+
+  // ==========================================
+  // END CALL
+  // ==========================================
+
+  endBtn.addEventListener(
+    "click",
+    function() {
+
+      if (currentCall) {
+
+        currentCall.close();
+
+      }
+
+
+      endCallUI();
+
+    }
+  );
+
+
+  // ==========================================
+  // END CALL UI
+  // ==========================================
+
+  function endCallUI() {
+
+    stopLocalStream();
+
+
+    if (currentCall) {
+
+      try {
+
+        currentCall.close();
+
+      } catch (error) {}
+
+    }
+
+
+    currentCall =
+      null;
+
+
+    incomingCall =
+      null;
+
+
+    localVideo.srcObject =
+      null;
+
+
+    remoteVideo.srcObject =
+      null;
+
+
+    videoSection.classList.add(
+      "hidden"
+    );
+
+
+    audioSection.classList.add(
+      "hidden"
+    );
+
+
+    callControls.classList.add(
+      "hidden"
+    );
+
+
+    incomingSection.classList.add(
+      "hidden"
+    );
+
+
+    isMuted =
+      false;
+
+
+    isCameraOff =
+      false;
+
+
+    muteBtn.textContent =
+      "🔇 Mute";
+
+
+    cameraBtn.textContent =
+      "📷 Camera Off";
+
+
+    status.textContent =
+      "🟢 Ready for another call.";
+
+  }
+
+
+  // ==========================================
+  // STOP LOCAL STREAM
+  // ==========================================
+
+  function stopLocalStream() {
+
+    if (!localStream) {
+      return;
+    }
+
+
+    localStream
+      .getTracks()
+      .forEach(
+        function(track) {
+
+          track.stop();
+
+        }
+      );
+
+
+    localStream =
+      null;
+
+  }
+
+
+  // ==========================================
+  // PEER ERROR
+  // ==========================================
+
+  peer.on(
+    "error",
+    function(error) {
+
+      console.error(
+        "PeerJS error:",
+        error
+      );
+
+
+      if (
+        error.type ===
+        "peer-unavailable"
+      ) {
+
+        status.textContent =
+          "❌ The other Peer ID is not online.";
+
+      } else {
+
+        status.textContent =
+          "❌ Connection error: " +
+          error.type;
+
+      }
+
+    }
+  );
+
+
+  // ==========================================
+  // PEER DISCONNECTED
+  // ==========================================
+
+  peer.on(
+    "disconnected",
+    function() {
+
+      status.textContent =
+        "⚠️ Disconnected from call server.";
+
+    }
+  );
+
+
+</script>
 
 </body>
-
 </html>
